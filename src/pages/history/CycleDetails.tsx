@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { differenceInCalendarDays, format } from 'date-fns';
 import { Droplets, Smile, Activity, FileText, Pencil, Trash2 } from 'lucide-react';
@@ -6,9 +6,11 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Loading } from '@/components/ui/Loading';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { Dialog } from '@/components/ui/Dialog';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { periodService } from '@/services/periodService';
+import { logService } from '@/services/logService';
 import { notify } from '@/utils/toast';
 import type { Database } from '@/types';
 
@@ -23,39 +25,50 @@ export default function CycleDetails() {
   const [period, setPeriod] = useState<Period | null>(null);
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!user || !id) return;
+    setLoading(true);
+    setError(null);
 
-    const load = async () => {
-      const { data: periodData } = await supabase.from('periods').select('*').eq('id', id).eq('user_id', user.id).single();
-      setPeriod(periodData ?? null);
-
-      if (periodData) {
-        const { data: logData } = await supabase
-          .from('logs')
-          .select('*')
-          .eq('user_id', user.id)
-          .gte('log_date', periodData.start_date)
-          .lte('log_date', periodData.end_date ?? periodData.start_date)
-          .order('log_date', { ascending: true });
-        setLogs(logData ?? []);
-      }
+    const { data: periodData, error: periodError } = await periodService.getPeriodById(id, user.id);
+    if (periodError) {
+      setError(periodError);
       setLoading(false);
-    };
+      return;
+    }
+    setPeriod(periodData ?? null);
 
-    load();
+    if (periodData) {
+      const { data: logData, error: logError } = await logService.getLogsInRange(
+        user.id,
+        periodData.start_date,
+        periodData.end_date ?? periodData.start_date
+      );
+      if (logError) {
+        setError(logError);
+        setLoading(false);
+        return;
+      }
+      setLogs(logData ?? []);
+    }
+    setLoading(false);
   }, [user, id]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleDelete = async () => {
     if (!period) return;
     setDeleting(true);
-    const { error } = await supabase.from('periods').delete().eq('id', period.id);
+    const { error: deleteError } = await periodService.deletePeriod(period.id);
     setDeleting(false);
-    if (error) {
-      notify.error(error.message);
+    if (deleteError) {
+      notify.error(deleteError);
       return;
     }
     notify.success('Cycle deleted');
@@ -63,6 +76,7 @@ export default function CycleDetails() {
   };
 
   if (loading) return <Loading fullScreen />;
+  if (error) return <ErrorState message="We couldn't load this cycle." onRetry={load} />;
 
   if (!period) {
     return (

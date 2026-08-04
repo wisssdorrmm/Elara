@@ -5,7 +5,7 @@ import { notify } from '@/utils/toast';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { periodService } from '@/services/periodService';
 import { cn } from '@/utils/cn';
 import type { FlowIntensity } from '@/types';
 
@@ -26,12 +26,10 @@ export default function LogFlow() {
     if (!user || !flow) return;
     setSaving(true);
     const today = new Date().toISOString().slice(0, 10);
-    const { error } = await supabase
-      .from('periods')
-      .upsert({ user_id: user.id, start_date: today, flow }, { onConflict: 'user_id,start_date' });
+    const { error } = await periodService.upsertPeriodForDate(user.id, today, { flow });
     setSaving(false);
     if (error) {
-      notify.error(error.message);
+      notify.error(error);
       return;
     }
     notify.success('Flow logged');

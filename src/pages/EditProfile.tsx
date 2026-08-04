@@ -4,18 +4,17 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { useProfile } from '@/hooks/useProfile';
 import { notify } from '@/utils/toast';
 import { cn } from '@/utils/cn';
 
 const reminderOptions = [10, 7, 5, 3, 1, 0];
 
 export default function EditProfile() {
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { profile, loading, error, refetch, updateProfile } = useProfile();
 
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [fullName, setFullName] = useState('');
   const [cycleLength, setCycleLength] = useState(28);
@@ -24,33 +23,21 @@ export default function EditProfile() {
   const [reminderTime, setReminderTime] = useState('08:00');
 
   useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setFullName(data.full_name ?? '');
-          setCycleLength(data.average_cycle_length);
-          setPeriodLength(data.average_period_length);
-          setReminderDays(data.reminder_days_before ?? [5]);
-          setReminderTime(data.reminder_time?.slice(0, 5) ?? '08:00');
-        }
-        setLoading(false);
-      });
-  }, [user]);
+    if (!profile) return;
+    setFullName(profile.full_name ?? '');
+    setCycleLength(profile.average_cycle_length);
+    setPeriodLength(profile.average_period_length);
+    setReminderDays(profile.reminder_days_before ?? [5]);
+    setReminderTime(profile.reminder_time?.slice(0, 5) ?? '08:00');
+  }, [profile]);
 
   const toggleReminderDay = (day: number) => {
     setReminderDays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]));
   };
 
   const handleSave = async () => {
-    if (!user) return;
     setSaving(true);
-    const { error } = await supabase.from('profiles').upsert({
-      user_id: user.id,
+    const { error: saveError } = await updateProfile({
       full_name: fullName,
       average_cycle_length: cycleLength,
       average_period_length: periodLength,
@@ -58,8 +45,8 @@ export default function EditProfile() {
       reminder_time: reminderTime,
     });
     setSaving(false);
-    if (error) {
-      notify.error(error.message);
+    if (saveError) {
+      notify.error(saveError);
       return;
     }
     notify.success('Profile updated');
@@ -67,6 +54,7 @@ export default function EditProfile() {
   };
 
   if (loading) return <Loading fullScreen />;
+  if (error) return <ErrorState message="We couldn't load your profile." onRetry={refetch} />;
 
   return (
     <div>

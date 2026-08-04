@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Moon, Bell, Globe, DatabaseBackup, Download, Trash2, ChevronRight } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Dialog } from '@/components/ui/Dialog';
+import { Loading } from '@/components/ui/Loading';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { notify } from '@/utils/toast';
+import { requestNotificationPermission } from '@/utils/notifications';
 import { cn } from '@/utils/cn';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -30,18 +33,40 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 export default function Settings() {
   const { signOut } = useAuth();
+  const { profile, loading, updateProfile } = useProfile();
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  useEffect(() => {
+    if (profile) setNotifications(profile.notifications_enabled);
+  }, [profile]);
+
+  const handleToggleNotifications = async (enabled: boolean) => {
+    setNotifications(enabled);
+    if (enabled) {
+      const permission = await requestNotificationPermission();
+      if (permission === 'denied') {
+        notify.info('Notifications are blocked in your browser settings.');
+      }
+    }
+    const { error } = await updateProfile({ notifications_enabled: enabled });
+    if (error) {
+      notify.error(error);
+      setNotifications(!enabled);
+    }
+  };
+
   const handleDeleteAccount = () => {
     // Account deletion requires a privileged server-side call (service role or
     // an Edge Function) since the anon client can't delete auth.users directly.
     // Wire this to a Supabase Edge Function in a future pass.
-    notify.info('Account deletion isn\u2019t wired up yet \u2014 contact support for now.');
+    notify.info("Account deletion isn't wired up yet — contact support for now.");
     setDeleteOpen(false);
   };
+
+  if (loading) return <Loading fullScreen />;
 
   return (
     <div>
@@ -56,7 +81,7 @@ export default function Settings() {
           <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-4">
             <Bell className="h-5 w-5 text-text-muted" />
             <span className="flex-1 text-sm font-medium text-text">Notifications</span>
-            <Toggle checked={notifications} onChange={setNotifications} />
+            <Toggle checked={notifications} onChange={handleToggleNotifications} />
           </div>
           <button
             onClick={() => navigate('/profile/edit')}

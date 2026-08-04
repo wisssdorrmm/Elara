@@ -23,6 +23,7 @@ export interface Database {
           cycle_is_regular: boolean | null;
           reminder_days_before: number[];
           reminder_time: string;
+          notifications_enabled: boolean;
           onboarding_completed: boolean;
           created_at: string;
           updated_at: string;

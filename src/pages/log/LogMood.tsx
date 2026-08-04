@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { notify } from '@/utils/toast';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { logService } from '@/services/logService';
 import { cn } from '@/utils/cn';
 
 const moods = [
@@ -18,6 +18,8 @@ const moods = [
   { label: 'Romantic', emoji: '💗' },
 ];
 
+const today = new Date().toISOString().slice(0, 10);
+
 export default function LogMood() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -25,19 +27,23 @@ export default function LogMood() {
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    if (!user) return;
+    logService.getLogByDate(user.id, today).then(({ data }) => {
+      if (data) {
+        setMood(data.mood ?? null);
+        setNote(data.notes ?? '');
+      }
+    });
+  }, [user]);
+
   const handleSave = async () => {
     if (!user || !mood) return;
     setSaving(true);
-    const today = new Date().toISOString().slice(0, 10);
-    const { error } = await supabase.from('logs').upsert({
-      user_id: user.id,
-      log_date: today,
-      mood,
-      notes: note || null,
-    });
+    const { error } = await logService.upsertLog(user.id, today, { mood, notes: note || null });
     setSaving(false);
     if (error) {
-      notify.error(error.message);
+      notify.error(error);
       return;
     }
     notify.success('Mood logged');

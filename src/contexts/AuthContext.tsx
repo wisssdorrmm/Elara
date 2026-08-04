@@ -1,6 +1,8 @@
 import { createContext, useEffect, useState, ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { authService } from '@/services/authService';
+import { profileService } from '@/services/profileService';
 
 interface AuthContextValue {
   session: Session | null;
@@ -19,11 +21,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    authService.getSession().then((s) => {
+      setSession(s);
       setLoading(false);
     });
 
+    // Session persistence + auto-login across reloads is handled by the
+    // Supabase client itself (persistSession: true in lib/supabase.ts);
+    // this listener just keeps React state in sync with it.
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
     });
@@ -32,24 +37,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp: AuthContextValue['signUp'] = async (email, password) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return { error: error?.message ?? null };
+    const { data, error } = await authService.signUp(email, password);
+    if (error) return { error };
+
+    // Every user gets a profile row immediately so onboarding-completion
+    // checks (ProtectedRoute) always have something to read.
+    if (data?.userId) {
+      const { error: profileError } = await profileService.createInitialProfile(data.userId);
+      if (profileError) return { error: profileError };
+    }
+
+    return { error: null };
   };
 
   const signIn: AuthContextValue['signIn'] = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    const { error } = await authService.signIn(email, password);
+    return { error };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await authService.signOut();
   };
 
   const resetPassword: AuthContextValue['resetPassword'] = async (email) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    });
-    return { error: error?.message ?? null };
+    const { error } = await authService.resetPassword(email);
+    return { error };
   };
 
   return (

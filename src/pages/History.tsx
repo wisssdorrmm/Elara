@@ -1,35 +1,18 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { differenceInCalendarDays, format } from 'date-fns';
 import { Clock } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Loading } from '@/components/ui/Loading';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
-import type { Database } from '@/types';
-
-type Period = Database['public']['Tables']['periods']['Row'];
+import { SkeletonList } from '@/components/ui/Skeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { usePeriods } from '@/hooks/usePeriods';
 
 export default function History() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { periods, loading, error, refetch } = usePeriods();
 
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('periods')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('start_date', { ascending: false })
-      .then(({ data }) => {
-        setPeriods(data ?? []);
-        setLoading(false);
-      });
-  }, [user]);
-
-  if (loading) return <Loading />;
+  if (loading) return <SkeletonList count={4} />;
+  if (error) return <ErrorState message="We couldn't load your history." onRetry={refetch} />;
 
   return (
     <div className="space-y-5">
@@ -39,17 +22,27 @@ export default function History() {
         <EmptyState icon={Clock} title="No cycles logged yet" description="Your past cycles will show up here once you start tracking." />
       ) : (
         <div className="space-y-3">
-          {periods.map((period) => (
-            <Card key={period.id} interactive onClick={() => navigate(`/history/${period.id}`)} role="button">
-              <p className="font-semibold text-text">
-                {new Date(period.start_date).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-              </p>
-              <p className="text-sm text-text-muted">
-                Started {new Date(period.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                {period.end_date && ` – ${new Date(period.end_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
-              </p>
-            </Card>
-          ))}
+          {periods.map((period, i) => {
+            const nextOlder = periods[i + 1];
+            const cycleLength = nextOlder
+              ? differenceInCalendarDays(new Date(period.start_date), new Date(nextOlder.start_date))
+              : null;
+            const periodLength = period.end_date
+              ? differenceInCalendarDays(new Date(period.end_date), new Date(period.start_date)) + 1
+              : null;
+
+            return (
+              <Card key={period.id} interactive onClick={() => navigate(`/history/${period.id}`)} role="button">
+                <p className="font-semibold text-text">{format(new Date(period.start_date), 'MMMM yyyy')}</p>
+                <p className="text-sm text-text-muted">
+                  Started {format(new Date(period.start_date), 'MMM d')}
+                  {period.end_date && ` – ${format(new Date(period.end_date), 'MMM d')}`}
+                  {periodLength && ` · ${periodLength} day period`}
+                  {cycleLength && ` · ${cycleLength} day cycle`}
+                </p>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

@@ -1,14 +1,12 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Bell, Shield, HelpCircle, Info, ChevronRight, Pencil } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { SkeletonCard } from '@/components/ui/Skeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
-import type { Database } from '@/types';
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
+import { useProfile } from '@/hooks/useProfile';
 
 const menuItems = [
   { label: 'Privacy', icon: Shield, path: '/settings' },
@@ -18,18 +16,8 @@ const menuItems = [
 
 export default function Profile() {
   const { user, signOut } = useAuth();
+  const { profile, loading, error, refetch } = useProfile();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => setProfile(data ?? null));
-  }, [user]);
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'User';
   const reminderDays = profile?.reminder_days_before?.length
@@ -39,6 +27,9 @@ export default function Profile() {
         .map((d) => (d === 0 ? 'Day of' : `${d}d`))
         .join(', ')
     : 'Not set';
+
+  if (loading) return <SkeletonCard />;
+  if (error) return <ErrorState message="We couldn't load your profile." onRetry={refetch} />;
 
   return (
     <div className="space-y-6">

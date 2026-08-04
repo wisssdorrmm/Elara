@@ -6,7 +6,8 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { profileService } from '@/services/profileService';
+import { periodService } from '@/services/periodService';
 import { cn } from '@/utils/cn';
 import type { CycleGoal } from '@/types';
 
@@ -49,8 +50,7 @@ export default function Onboarding() {
     }
     setSaving(true);
     try {
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        user_id: user.id,
+      const { error: profileError } = await profileService.updateProfile(user.id, {
         full_name: fullName || null,
         date_of_birth: dateOfBirth || null,
         goal,
@@ -61,13 +61,11 @@ export default function Onboarding() {
         reminder_time: reminderTime,
         onboarding_completed: true,
       });
-      if (profileError) throw profileError;
+      if (profileError) throw new Error(profileError);
 
       if (lastPeriodStart) {
-        const { error: periodError } = await supabase
-          .from('periods')
-          .upsert({ user_id: user.id, start_date: lastPeriodStart }, { onConflict: 'user_id,start_date' });
-        if (periodError) throw periodError;
+        const { error: periodError } = await periodService.upsertPeriodForDate(user.id, lastPeriodStart, {});
+        if (periodError) throw new Error(periodError);
       }
 
       notify.success("You're all set!");

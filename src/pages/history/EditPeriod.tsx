@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+import { periodService } from '@/services/periodService';
 import { notify } from '@/utils/toast';
 import { cn } from '@/utils/cn';
 import type { FlowIntensity } from '@/types';
@@ -25,32 +25,27 @@ export default function EditPeriod() {
 
   useEffect(() => {
     if (!user || !id) return;
-    supabase
-      .from('periods')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setStartDate(data.start_date);
-          setEndDate(data.end_date ?? '');
-          setFlow(data.flow ?? '');
-        }
-        setLoading(false);
-      });
+    periodService.getPeriodById(id, user.id).then(({ data }) => {
+      if (data) {
+        setStartDate(data.start_date);
+        setEndDate(data.end_date ?? '');
+        setFlow(data.flow ?? '');
+      }
+      setLoading(false);
+    });
   }, [user, id]);
 
   const handleSave = async () => {
     if (!id) return;
     setSaving(true);
-    const { error } = await supabase
-      .from('periods')
-      .update({ start_date: startDate, end_date: endDate || null, flow: flow || null })
-      .eq('id', id);
+    const { error } = await periodService.updatePeriod(id, {
+      start_date: startDate,
+      end_date: endDate || null,
+      flow: flow || null,
+    });
     setSaving(false);
     if (error) {
-      notify.error(error.message);
+      notify.error(error);
       return;
     }
     notify.success('Cycle updated');
