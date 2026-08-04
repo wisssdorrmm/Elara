@@ -1,0 +1,85 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { notify } from '@/utils/toast';
+import { Navbar } from '@/components/layout/Navbar';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { cn } from '@/utils/cn';
+
+const moods = [
+  { label: 'Happy', emoji: '😊' },
+  { label: 'Calm', emoji: '😌' },
+  { label: 'Neutral', emoji: '😐' },
+  { label: 'Sad', emoji: '😢' },
+  { label: 'Anxious', emoji: '😰' },
+  { label: 'Irritable', emoji: '😠' },
+  { label: 'Energetic', emoji: '⚡' },
+  { label: 'Romantic', emoji: '💗' },
+];
+
+export default function LogMood() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [mood, setMood] = useState<string | null>(null);
+  const [note, setNote] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!user || !mood) return;
+    setSaving(true);
+    const today = new Date().toISOString().slice(0, 10);
+    const { error } = await supabase.from('logs').upsert({
+      user_id: user.id,
+      log_date: today,
+      mood,
+      notes: note || null,
+    });
+    setSaving(false);
+    if (error) {
+      notify.error(error.message);
+      return;
+    }
+    notify.success('Mood logged');
+    navigate('/dashboard');
+  };
+
+  return (
+    <div>
+      <Navbar title="Mood" showBack />
+      <div className="app-page pt-0">
+        <p className="mb-6 text-text-muted">How are you feeling?</p>
+        <div className="mb-6 grid grid-cols-3 gap-3">
+          {moods.map(({ label, emoji }) => (
+            <button
+              key={label}
+              onClick={() => setMood(label)}
+              className={cn(
+                'flex flex-col items-center gap-2 rounded-card border-2 bg-white py-4 shadow-card',
+                mood === label ? 'border-primary' : 'border-transparent'
+              )}
+            >
+              <span className="text-2xl">{emoji}</span>
+              <span className="text-xs font-medium text-text">{label}</span>
+            </button>
+          ))}
+        </div>
+
+        <label className="mb-1.5 block text-sm font-medium text-text">Add note (optional)</label>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Write something..."
+          rows={3}
+          className="w-full rounded-input border border-gray-200 bg-white px-4 py-3.5 text-base placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        />
+
+        <div className="mt-8">
+          <Button disabled={!mood} loading={saving} onClick={handleSave}>
+            Save
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
