@@ -42,36 +42,38 @@ export default function ResetPassword() {
   };
 
   return (
-    <div>
+    <div className="flex min-h-screen flex-col">
       <Navbar showBack />
-      <div className="app-page pt-0">
-        <h1 className="mb-1 text-2xl font-bold text-text">Set a new password</h1>
-        <p className="mb-8 text-text-muted">Choose a new password for your account.</p>
+      <div className="flex flex-1 items-center justify-center px-5">
+        <div className="w-full">
+          <h1 className="mb-1 text-2xl font-bold text-text">Set a new password</h1>
+          <p className="mb-8 text-text-muted">Choose a new password for your account.</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input
-            label="New password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="••••••••••"
-            error={errors.password?.message}
-            trailing={
-              <button type="button" onClick={() => setShowPassword((s) => !s)} aria-label="Toggle password visibility">
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            }
-            {...register('password')}
-          />
-          <Input
-            label="Confirm new password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="••••••••••"
-            error={errors.confirmPassword?.message}
-            {...register('confirmPassword')}
-          />
-          <Button type="submit" loading={isSubmitting}>
-            Update Password
-          </Button>
-        </form>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <Input
+              label="New password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••••"
+              error={errors.password?.message}
+              trailing={
+                <button type="button" onClick={() => setShowPassword((s) => !s)} aria-label="Toggle password visibility">
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              }
+              {...register('password')}
+            />
+            <Input
+              label="Confirm new password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••••"
+              error={errors.confirmPassword?.message}
+              {...register('confirmPassword')}
+            />
+            <Button type="submit" loading={isSubmitting}>
+              Update Password
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );
