@@ -60,6 +60,7 @@ export default function CalendarPage() {
   }
 
   const stats = computeCycleStats(periods, profile?.average_cycle_length ?? 28, profile?.average_period_length ?? 5);
+  const averagePeriodLength = profile?.average_period_length ?? 5;
   const selectedPeriod = periods.find((p) => p.start_date === format(selectedDate, 'yyyy-MM-dd'));
 
   return (
@@ -69,7 +70,7 @@ export default function CalendarPage() {
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         getDayState={(date) => {
-          const state = getDayState(date, periods, stats);
+          const state = getDayState(date, periods, stats, averagePeriodLength);
           return state === 'none' ? 'none' : state;
         }}
       />

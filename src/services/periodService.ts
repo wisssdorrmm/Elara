@@ -1,6 +1,8 @@
+import { differenceInCalendarDays } from 'date-fns';
 import { supabase } from '@/lib/supabase';
 import type { ServiceResult } from './authService';
 import type { Database } from '@/types/database';
+import type { FlowIntensity } from '@/types';
 
 type Period = Database['public']['Tables']['periods']['Row'];
 type PeriodInsert = Database['public']['Tables']['periods']['Insert'];
@@ -23,7 +25,48 @@ export const periodService = {
     return { data, error: null };
   },
 
-  /** Logs or updates flow for a specific day - used by the daily "Log Flow" screen. */
+  /**
+   * Logs flow for a specific day as part of ONE continuous period, instead of
+   * creating a separate period row per day. Rules:
+   *  - No periods yet, or a real gap (2+ days) since the last logged day -> start a new period.
+   *  - The date falls within [start_date, end_date] of the most recent period -> just update its flow.
+   *  - The date is exactly the day after the most recent period's last known day -> extend end_date forward.
+   *  - The date is exactly the day before the most recent period's start_date -> extend start_date backward.
+   * This is what LogFlow.tsx should call - NOT upsertPeriodForDate (kept below for the
+   * one-time "last period start" write during onboarding, which has no continuation logic).
+   */
+  async logFlowForDate(userId: string, date: string, flow: FlowIntensity): Promise<ServiceResult<Period>> {
+    const { data: periods, error: fetchError } = await periodService.getPeriods(userId);
+    if (fetchError) return { data: null, error: fetchError };
+
+    const mostRecent = periods?.[0] ?? null;
+
+    if (!mostRecent) {
+      return periodService.createPeriod(userId, { start_date: date, flow });
+    }
+
+    const lastKnownDay = mostRecent.end_date ?? mostRecent.start_date;
+
+    // Already within the known range of the most recent period - just update flow.
+    if (date >= mostRecent.start_date && date <= lastKnownDay) {
+      return periodService.updatePeriod(mostRecent.id, { flow });
+    }
+
+    const gapForward = differenceInCalendarDays(new Date(date), new Date(lastKnownDay));
+    if (gapForward === 1) {
+      return periodService.updatePeriod(mostRecent.id, { end_date: date, flow });
+    }
+
+    const gapBackward = differenceInCalendarDays(new Date(mostRecent.start_date), new Date(date));
+    if (gapBackward === 1) {
+      return periodService.updatePeriod(mostRecent.id, { start_date: date, flow });
+    }
+
+    // A real gap (2+ days) since any known activity on the most recent period - new period.
+    return periodService.createPeriod(userId, { start_date: date, flow });
+  },
+
+  /** One-time write used by Onboarding for "when did your last period start" - no continuation logic. */
   async upsertPeriodForDate(userId: string, startDate: string, updates: Omit<PeriodInsert, 'user_id' | 'start_date'>): Promise<ServiceResult<Period>> {
     const { data, error } = await supabase
       .from('periods')

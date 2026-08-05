@@ -26,6 +26,20 @@ export const profileService = {
     return { data, error: null };
   },
 
+  /**
+   * Ensures a profile row exists for this user, creating one if missing.
+   * Safe to call on every sign-in/session-restore - if email confirmation was
+   * required, no profile could be created at signUp time (RLS blocks inserts
+   * without an active session), so this is what actually creates it once a
+   * real session exists, whether that's immediately or after confirming.
+   */
+  async ensureProfileExists(userId: string): Promise<ServiceResult<Profile>> {
+    const { data: existing, error: fetchError } = await profileService.getProfile(userId);
+    if (fetchError) return { data: null, error: fetchError };
+    if (existing) return { data: existing, error: null };
+    return profileService.createInitialProfile(userId);
+  },
+
   async updateProfile(
     userId: string,
     updates: Omit<ProfileUpdate, 'id' | 'created_at' | 'updated_at'>

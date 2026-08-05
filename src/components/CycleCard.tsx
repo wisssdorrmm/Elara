@@ -6,6 +6,8 @@ interface CycleCardProps {
   nextPeriodDate: string;
   cycleDay: number;
   phase: CyclePhase;
+  isOverdue?: boolean;
+  daysOverdue?: number;
 }
 
 const phaseLabels: Record<CyclePhase, string> = {
@@ -15,7 +17,7 @@ const phaseLabels: Record<CyclePhase, string> = {
   luteal: 'Luteal phase',
 };
 
-export function CycleCard({ daysUntilNextPeriod, nextPeriodDate, cycleDay, phase }: CycleCardProps) {
+export function CycleCard({ daysUntilNextPeriod, nextPeriodDate, cycleDay, phase, isOverdue, daysOverdue }: CycleCardProps) {
   // Simple ring progress based on a 28-day average cycle; refined with real data in Part 2.
   const progress = Math.min(cycleDay / 28, 1);
   const circumference = 2 * Math.PI * 40;
@@ -24,8 +26,17 @@ export function CycleCard({ daysUntilNextPeriod, nextPeriodDate, cycleDay, phase
   return (
     <Card className="flex items-center justify-between">
       <div>
-        <p className="text-sm text-text-muted">Next period in</p>
-        <p className="text-3xl font-bold text-text">{daysUntilNextPeriod} days</p>
+        {isOverdue && daysOverdue ? (
+          <>
+            <p className="text-sm text-danger">Period may be late</p>
+            <p className="text-3xl font-bold text-text">{daysOverdue}d late</p>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-text-muted">Next period in</p>
+            <p className="text-3xl font-bold text-text">{daysUntilNextPeriod} days</p>
+          </>
+        )}
         <p className="mt-1 text-sm text-text-muted">{nextPeriodDate}</p>
         <p className="mt-3 text-sm font-medium text-text">
           Cycle day <span className="text-primary">{cycleDay}</span>

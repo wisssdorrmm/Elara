@@ -7,14 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { periodService } from '@/services/periodService';
 import { cn } from '@/utils/cn';
+import { FLOW_OPTIONS } from '@/constants';
 import type { FlowIntensity } from '@/types';
-
-const flowOptions: { value: FlowIntensity; label: string; drops: number }[] = [
-  { value: 'light', label: 'Light', drops: 1 },
-  { value: 'medium', label: 'Medium', drops: 2 },
-  { value: 'heavy', label: 'Heavy', drops: 3 },
-  { value: 'very_heavy', label: 'Very heavy', drops: 4 },
-];
 
 export default function LogFlow() {
   const navigate = useNavigate();
@@ -26,7 +20,9 @@ export default function LogFlow() {
     if (!user || !flow) return;
     setSaving(true);
     const today = new Date().toISOString().slice(0, 10);
-    const { error } = await periodService.upsertPeriodForDate(user.id, today, { flow });
+    // Extends the current period if this continues it, or starts a new one
+    // if there's a real gap since the last logged day - see periodService.
+    const { error } = await periodService.logFlowForDate(user.id, today, flow);
     setSaving(false);
     if (error) {
       notify.error(error);
@@ -42,7 +38,7 @@ export default function LogFlow() {
       <div className="app-page pt-0">
         <p className="mb-6 text-text-muted">How heavy is your flow?</p>
         <div className="space-y-3">
-          {flowOptions.map(({ value, label, drops }) => (
+          {FLOW_OPTIONS.map(({ value, label, drops }) => (
             <button
               key={value}
               onClick={() => setFlow(value)}

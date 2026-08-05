@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff, Check, MailCheck } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +30,8 @@ export default function Register() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const {
     register,
     handleSubmit,
@@ -41,14 +43,39 @@ export default function Register() {
   const agreed = watch('agreed');
 
   const onSubmit = async (values: FormValues) => {
-    const { error } = await signUp(values.email, values.password);
+    const { error, needsEmailConfirmation } = await signUp(values.email, values.password);
     if (error) {
       notify.error(error);
       return;
     }
+
+    if (needsEmailConfirmation) {
+      // Supabase's "Confirm email" setting is on for this project - don't
+      // send them into onboarding until they've actually verified.
+      setSubmittedEmail(values.email);
+      setAwaitingConfirmation(true);
+      return;
+    }
+
     notify.success('Account created!');
     navigate('/onboarding');
   };
+
+  if (awaitingConfirmation) {
+    return (
+      <div className="app-page flex flex-col items-center pt-20 text-center">
+        <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <MailCheck className="h-8 w-8 text-primary" />
+        </span>
+        <h1 className="mb-2 text-2xl font-bold text-text">Check your email</h1>
+        <p className="mb-8 text-text-muted">
+          We sent a confirmation link to <span className="font-medium text-text">{submittedEmail}</span>. Click it to
+          verify your account, then log in to continue.
+        </p>
+        <Button onClick={() => navigate('/login')}>Back to Login</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="app-page">

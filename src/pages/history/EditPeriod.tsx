@@ -8,9 +8,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { periodService } from '@/services/periodService';
 import { notify } from '@/utils/toast';
 import { cn } from '@/utils/cn';
+import { FLOW_OPTIONS } from '@/constants';
 import type { FlowIntensity } from '@/types';
-
-const flowOptions: FlowIntensity[] = ['light', 'medium', 'heavy', 'very_heavy'];
 
 export default function EditPeriod() {
   const { id } = useParams<{ id: string }>();
@@ -64,16 +63,16 @@ export default function EditPeriod() {
         <div>
           <p className="mb-1.5 text-sm font-medium text-text">Flow</p>
           <div className="grid grid-cols-2 gap-2">
-            {flowOptions.map((option) => (
+            {FLOW_OPTIONS.map(({ value, label }) => (
               <button
-                key={option}
-                onClick={() => setFlow(option)}
+                key={value}
+                onClick={() => setFlow(value)}
                 className={cn(
-                  'rounded-button border py-3 text-sm font-medium capitalize',
-                  flow === option ? 'border-primary bg-primary text-white' : 'border-gray-200 bg-white text-text'
+                  'rounded-button border py-3 text-sm font-medium',
+                  flow === value ? 'border-primary bg-primary text-white' : 'border-gray-200 bg-white text-text'
                 )}
               >
-                {option.replace('_', ' ')}
+                {label}
               </button>
             ))}
           </div>

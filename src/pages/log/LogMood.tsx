@@ -6,17 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { logService } from '@/services/logService';
 import { cn } from '@/utils/cn';
-
-const moods = [
-  { label: 'Happy', emoji: '😊' },
-  { label: 'Calm', emoji: '😌' },
-  { label: 'Neutral', emoji: '😐' },
-  { label: 'Sad', emoji: '😢' },
-  { label: 'Anxious', emoji: '😰' },
-  { label: 'Irritable', emoji: '😠' },
-  { label: 'Energetic', emoji: '⚡' },
-  { label: 'Romantic', emoji: '💗' },
-];
+import { MOOD_OPTIONS } from '@/constants';
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -56,7 +46,7 @@ export default function LogMood() {
       <div className="app-page pt-0">
         <p className="mb-6 text-text-muted">How are you feeling?</p>
         <div className="mb-6 grid grid-cols-3 gap-3">
-          {moods.map(({ label, emoji }) => (
+          {MOOD_OPTIONS.map(({ label, emoji }) => (
             <button
               key={label}
               onClick={() => setMood(label)}

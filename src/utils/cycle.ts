@@ -13,8 +13,10 @@ export interface CycleStats {
   /** Predicted start date of the next period (always in the future, rolled forward if overdue). */
   nextPeriodDate: Date | null;
   daysUntilNextPeriod: number | null;
-  /** True if the next predicted period is today or earlier (i.e. it's late). */
+  /** True if the raw (un-rolled) predicted period date has already passed. */
   isOverdue: boolean;
+  /** How many days late the period is, if overdue (0 otherwise). */
+  daysOverdue: number;
   ovulationDate: Date | null;
   fertileWindowStart: Date | null;
   fertileWindowEnd: Date | null;
@@ -61,6 +63,7 @@ export function computeCycleStats(
       nextPeriodDate: null,
       daysUntilNextPeriod: null,
       isOverdue: false,
+      daysOverdue: 0,
       ovulationDate: null,
       fertileWindowStart: null,
       fertileWindowEnd: null,
@@ -73,14 +76,20 @@ export function computeCycleStats(
   const daysSinceStart = differenceInCalendarDays(normalizedToday, lastStart);
   const cycleDay = ((daysSinceStart % averageCycleLength) + averageCycleLength) % averageCycleLength + 1;
 
+  // The single-cycle prediction, BEFORE rolling forward - used to detect "late".
+  const rawNextPeriodDate = addDays(lastStart, averageCycleLength);
+  const isOverdue = normalizedToday > rawNextPeriodDate;
+  const daysOverdue = isOverdue ? differenceInCalendarDays(normalizedToday, rawNextPeriodDate) : 0;
+
   // Roll the predicted next period forward until it's actually in the future,
-  // in case the user hasn't logged a period in a while.
-  let nextPeriodDate = addDays(lastStart, averageCycleLength);
+  // in case the user hasn't logged a period in a while. Used for the "Next
+  // period in N days" display, which should always show a future date even
+  // when the period is late.
+  let nextPeriodDate = rawNextPeriodDate;
   while (nextPeriodDate <= normalizedToday) {
     nextPeriodDate = addDays(nextPeriodDate, averageCycleLength);
   }
   const daysUntilNextPeriod = differenceInCalendarDays(nextPeriodDate, normalizedToday);
-  const isOverdue = daysUntilNextPeriod === 0 && differenceInCalendarDays(normalizedToday, lastStart) >= averageCycleLength;
 
   // Ovulation ~14 days before the next period; fertile window is the 5 days
   // leading up to and including ovulation day.
@@ -97,6 +106,7 @@ export function computeCycleStats(
     nextPeriodDate,
     daysUntilNextPeriod,
     isOverdue,
+    daysOverdue,
     ovulationDate,
     fertileWindowStart,
     fertileWindowEnd,
@@ -140,8 +150,10 @@ export type DayState = 'period' | 'predicted' | 'ovulation' | 'fertile' | 'none'
 /**
  * Determines what a single calendar day should be highlighted as, given the
  * full list of logged periods and the computed cycle stats for "today".
+ * `averagePeriodLength` controls how many days the predicted period spans -
+ * this must come from the user's profile, not a hardcoded value.
  */
-export function getDayState(date: Date, periods: Period[], stats: CycleStats): DayState {
+export function getDayState(date: Date, periods: Period[], stats: CycleStats, averagePeriodLength: number): DayState {
   const day = startOfDay(date);
 
   const inActualPeriod = periods.some((p) => {
@@ -152,9 +164,7 @@ export function getDayState(date: Date, periods: Period[], stats: CycleStats): D
   if (inActualPeriod) return 'period';
 
   if (stats.nextPeriodDate) {
-    // Approximate predicted period length using the same average used elsewhere;
-    // callers pass averagePeriodLength via stats consumers when needed.
-    const predictedEnd = addDays(stats.nextPeriodDate, 4);
+    const predictedEnd = addDays(stats.nextPeriodDate, Math.max(averagePeriodLength - 1, 0));
     if (isWithinInterval(day, { start: stats.nextPeriodDate, end: predictedEnd })) return 'predicted';
   }
 

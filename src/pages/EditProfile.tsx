@@ -8,8 +8,7 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { useProfile } from '@/hooks/useProfile';
 import { notify } from '@/utils/toast';
 import { cn } from '@/utils/cn';
-
-const reminderOptions = [10, 7, 5, 3, 1, 0];
+import { REMINDER_DAY_OPTIONS, formatReminderDayLabel } from '@/constants';
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -95,7 +94,7 @@ export default function EditProfile() {
         <div>
           <p className="mb-2 text-sm font-medium text-text">Remind me before my period</p>
           <div className="grid grid-cols-3 gap-2">
-            {reminderOptions.map((day) => (
+            {REMINDER_DAY_OPTIONS.map((day) => (
               <button
                 key={day}
                 onClick={() => toggleReminderDay(day)}
@@ -104,7 +103,7 @@ export default function EditProfile() {
                   reminderDays.includes(day) ? 'border-primary bg-primary text-white' : 'border-gray-200 bg-white text-text'
                 )}
               >
-                {day === 0 ? 'On the day' : `${day} day${day > 1 ? 's' : ''} before`}
+                {formatReminderDayLabel(day)}
               </button>
             ))}
           </div>

@@ -22,6 +22,14 @@ const dayStateStyles: Record<DayState, string> = {
   fertile: 'bg-accent/20 text-primary',
 };
 
+const dayStateLabels: Record<DayState, string> = {
+  none: '',
+  period: 'period',
+  predicted: 'predicted period',
+  ovulation: 'ovulation day',
+  fertile: 'fertile window',
+};
+
 export function CalendarCard({ selectedDate, onSelectDate, getDayState }: CalendarCardProps) {
   const [monthCursor, setMonthCursor] = useState(selectedDate ?? new Date());
 
@@ -64,11 +72,14 @@ export function CalendarCard({ selectedDate, onSelectDate, getDayState }: Calend
         {days.map((day) => {
           const state = getDayState?.(day) ?? 'none';
           const isSelected = selectedDate && format(selectedDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd');
+          const stateLabel = dayStateLabels[state];
 
           return (
             <button
               key={day.toISOString()}
               onClick={() => onSelectDate?.(day)}
+              aria-label={`${format(day, 'MMMM d, yyyy')}${stateLabel ? `, ${stateLabel}` : ''}${isSelected ? ', selected' : ''}`}
+              aria-pressed={isSelected}
               className={cn(
                 'mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors',
                 dayStateStyles[state],

@@ -18,6 +18,7 @@ export function BottomNavigation() {
           <NavLink
             key={path}
             to={path}
+            aria-label={label}
             className={({ isActive }) =>
               cn(
                 'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full py-1.5 transition-colors',

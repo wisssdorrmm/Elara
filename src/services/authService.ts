@@ -6,11 +6,14 @@ export interface ServiceResult<T = null> {
 }
 
 export const authService = {
-  async signUp(email: string, password: string): Promise<ServiceResult<{ userId: string }>> {
+  async signUp(email: string, password: string): Promise<ServiceResult<{ userId: string; needsEmailConfirmation: boolean }>> {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) return { data: null, error: error.message };
     if (!data.user) return { data: null, error: 'Sign up succeeded but no user was returned.' };
-    return { data: { userId: data.user.id }, error: null };
+    // If Supabase's "Confirm email" setting is on, signUp succeeds but returns
+    // no active session until the user clicks the emailed link.
+    const needsEmailConfirmation = !data.session;
+    return { data: { userId: data.user.id, needsEmailConfirmation }, error: null };
   },
 
   async signIn(email: string, password: string): Promise<ServiceResult> {

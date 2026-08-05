@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { profileService } from '@/services/profileService';
 import { periodService } from '@/services/periodService';
 import { cn } from '@/utils/cn';
+import { REMINDER_DAY_OPTIONS, formatReminderDayLabel } from '@/constants';
 import type { CycleGoal } from '@/types';
 
 const TOTAL_STEPS = 5;
@@ -20,8 +21,6 @@ const goals: { value: CycleGoal; label: string; icon: typeof Target }[] = [
   { value: 'understand_body', label: 'Understand my body', icon: Sparkles },
   { value: 'manage_irregular_cycles', label: 'Manage irregular cycles', icon: Waves },
 ];
-
-const reminderOptions = [10, 7, 5, 3, 1, 0];
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -193,7 +192,7 @@ export default function Onboarding() {
             <p className="mb-6 text-text-muted">We&apos;ll remind you before important days.</p>
             <p className="mb-2 text-sm font-medium text-text">Remind me before my period</p>
             <div className="mb-5 grid grid-cols-3 gap-2">
-              {reminderOptions.map((day) => (
+              {REMINDER_DAY_OPTIONS.map((day) => (
                 <button
                   key={day}
                   onClick={() => toggleReminderDay(day)}
@@ -202,7 +201,7 @@ export default function Onboarding() {
                     reminderDays.includes(day) ? 'border-primary bg-primary text-white' : 'border-gray-200 bg-white text-text'
                   )}
                 >
-                  {day === 0 ? 'On the day' : `${day} day${day > 1 ? 's' : ''} before`}
+                  {formatReminderDayLabel(day)}
                 </button>
               ))}
             </div>

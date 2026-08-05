@@ -107,6 +107,8 @@ The app is a static PWA build and deploys to any static host (Vercel, Netlify, C
 2. Build command: `npm run build`
 3. Output directory: `dist`
 
+`vercel.json` in the repo root rewrites all paths to `index.html`, so refreshing or directly linking to a route like `/dashboard` won't 404 (this app uses React Router's `BrowserRouter`, which needs that on any static host).
+
 Remember to add your deployed domain to Supabase → Authentication → URL Configuration (Site URL / Redirect URLs) so auth and password-reset links work correctly.
 
 ## Routes

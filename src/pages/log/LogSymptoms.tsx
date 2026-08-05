@@ -6,20 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { logService } from '@/services/logService';
 import { cn } from '@/utils/cn';
-
-const symptomOptions = [
-  'Cramps',
-  'Headache',
-  'Back pain',
-  'Bloating',
-  'Fatigue',
-  'Acne',
-  'Tender breasts',
-  'Nausea',
-  'Constipation',
-  'Diarrhea',
-  'Food cravings',
-];
+import { SYMPTOM_OPTIONS } from '@/constants';
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -68,7 +55,7 @@ export default function LogSymptoms() {
       <div className="app-page pt-0">
         <p className="mb-4 text-text-muted">Select all that apply</p>
         <div className="mb-6 flex flex-wrap gap-2">
-          {symptomOptions.map((symptom) => (
+          {SYMPTOM_OPTIONS.map((symptom) => (
             <button
               key={symptom}
               onClick={() => toggle(symptom)}
