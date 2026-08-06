@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Check, MailCheck } from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
@@ -64,32 +63,27 @@ export default function Register() {
 
   if (awaitingConfirmation) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <Navbar showBack />
-        <div className="flex flex-1 flex-col items-center justify-center px-5 text-center">
-          <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <MailCheck className="h-8 w-8 text-primary" />
-          </span>
-          <h1 className="mb-2 text-2xl font-bold text-text">Check your email</h1>
-          <p className="mb-8 text-text-muted">
-            We sent a confirmation link to <span className="font-medium text-text">{submittedEmail}</span>. Click it to
-            verify your account, then log in to continue.
-          </p>
-          <Button onClick={() => navigate('/login')}>Back to Login</Button>
-        </div>
+      <div className="flex min-h-screen flex-col items-center justify-center px-5 text-center">
+        <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <MailCheck className="h-8 w-8 text-primary" />
+        </span>
+        <h1 className="mb-2 text-2xl font-bold text-text">Check your email</h1>
+        <p className="mb-8 text-text-muted">
+          We sent a confirmation link to <span className="font-medium text-text">{submittedEmail}</span>. Click it to
+          verify your account, then log in to continue.
+        </p>
+        <Button onClick={() => navigate('/login')}>Back to Login</Button>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar showBack />
-      <div className="flex flex-1 items-center justify-center px-5">
-        <div className="w-full">
-          <h1 className="mb-1 text-2xl font-bold text-text">Create Account</h1>
-          <p className="mb-8 text-text-muted">Sign up to get started</p>
+    <div className="flex min-h-screen items-center justify-center px-5">
+      <div className="w-full">
+        <h1 className="mb-1 text-2xl font-bold text-text">Create Account</h1>
+        <p className="mb-8 text-text-muted">Sign up to get started</p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input label="Full name" placeholder="Enter your name" error={errors.fullName?.message} {...register('fullName')} />
           <Input label="Email" type="email" placeholder="you@example.com" error={errors.email?.message} {...register('email')} />
           <Input
@@ -146,7 +140,6 @@ export default function Register() {
             Log in
           </Link>
         </p>
-        </div>
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { usePeriods } from '@/hooks/usePeriods';
 import { logService } from '@/services/logService';
 import { computeCycleStats, getDayState } from '@/utils/cycle';
+import { FLOW_LABELS } from '@/constants';
 import type { Database } from '@/types';
 
 type Log = Database['public']['Tables']['logs']['Row'];
@@ -93,13 +94,18 @@ export default function CalendarPage() {
       <Card>
         <div className="mb-3 flex items-center justify-between">
           <p className="font-semibold text-text">{format(selectedDate, 'EEEE, MMM d')}</p>
-          {selectedPeriod?.flow && <Badge tone="danger">{selectedPeriod.flow.replace('_', ' ')} flow</Badge>}
+          {selectedLog?.flow && <Badge tone="danger">{FLOW_LABELS[selectedLog.flow]} flow</Badge>}
         </div>
 
         {logLoading ? (
           <p className="text-sm text-text-muted">Loading...</p>
         ) : selectedLog || selectedPeriod ? (
           <div className="space-y-2 text-sm">
+            {selectedLog?.flow && (
+              <div className="flex items-center gap-2 text-text-muted">
+                <Droplets className="h-4 w-4" /> Flow: {FLOW_LABELS[selectedLog.flow]}
+              </div>
+            )}
             {selectedLog?.mood && (
               <div className="flex items-center gap-2 text-text-muted">
                 <Smile className="h-4 w-4" /> Mood: {selectedLog.mood}
@@ -115,18 +121,13 @@ export default function CalendarPage() {
                 <FileText className="h-4 w-4 shrink-0 mt-0.5" /> {selectedLog.notes}
               </div>
             )}
-            {selectedPeriod?.flow && !selectedLog && (
-              <div className="flex items-center gap-2 text-text-muted">
-                <Droplets className="h-4 w-4" /> Flow: {selectedPeriod.flow.replace('_', ' ')}
-              </div>
-            )}
           </div>
         ) : (
           <p className="text-sm text-text-muted">Nothing logged for this day yet.</p>
         )}
 
         <button
-          onClick={() => navigate('/log/symptoms')}
+          onClick={() => navigate('/log')}
           className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary"
         >
           <Plus className="h-4 w-4" /> {selectedLog ? 'Edit log' : 'Log this day'}

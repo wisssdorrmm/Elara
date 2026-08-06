@@ -5,7 +5,7 @@ export type CycleGoal =
   | 'understand_body'
   | 'manage_irregular_cycles';
 
-export type FlowIntensity = 'light' | 'medium' | 'heavy' | 'very_heavy';
+export type FlowIntensity = 'spotting' | 'light' | 'medium' | 'heavy' | 'very_heavy';
 
 export interface Database {
   public: {
@@ -40,7 +40,6 @@ export interface Database {
           user_id: string;
           start_date: string;
           end_date: string | null;
-          flow: FlowIntensity | null;
           created_at: string;
           updated_at: string;
         };
@@ -56,9 +55,11 @@ export interface Database {
           id: string;
           user_id: string;
           log_date: string;
+          flow: FlowIntensity | null;
           symptoms: string[];
           mood: string | null;
           pain_level: number | null;
+          sleep_hours: number | null;
           notes: string | null;
           created_at: string;
           updated_at: string;

@@ -14,12 +14,17 @@ import Onboarding from '@/pages/Onboarding';
 import Dashboard from '@/pages/Dashboard';
 import CalendarPage from '@/pages/Calendar';
 import LogHub from '@/pages/log/LogHub';
+import LogPeriod from '@/pages/log/LogPeriod';
 import LogFlow from '@/pages/log/LogFlow';
 import LogSymptoms from '@/pages/log/LogSymptoms';
 import LogMood from '@/pages/log/LogMood';
+import LogPain from '@/pages/log/LogPain';
+import LogSleep from '@/pages/log/LogSleep';
+import LogNotes from '@/pages/log/LogNotes';
 import History from '@/pages/History';
 import CycleDetails from '@/pages/history/CycleDetails';
 import EditPeriod from '@/pages/history/EditPeriod';
+import PeriodReport from '@/pages/history/PeriodReport';
 import Profile from '@/pages/Profile';
 import EditProfile from '@/pages/EditProfile';
 import Settings from '@/pages/Settings';
@@ -71,6 +76,14 @@ export default function App() {
           }
         />
         <Route
+          path="/log/period"
+          element={
+            <ProtectedRoute>
+              <LogPeriod />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/log/flow"
           element={
             <ProtectedRoute>
@@ -91,6 +104,30 @@ export default function App() {
           element={
             <ProtectedRoute>
               <LogMood />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/log/pain"
+          element={
+            <ProtectedRoute>
+              <LogPain />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/log/sleep"
+          element={
+            <ProtectedRoute>
+              <LogSleep />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/log/notes"
+          element={
+            <ProtectedRoute>
+              <LogNotes />
             </ProtectedRoute>
           }
         />
@@ -117,6 +154,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <EditPeriod />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history/:id/report"
+          element={
+            <ProtectedRoute>
+              <PeriodReport />
             </ProtectedRoute>
           }
         />

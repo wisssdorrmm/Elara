@@ -12,7 +12,7 @@ import { useLogs } from '@/hooks/useLogs';
 import { computeCycleStats } from '@/utils/cycle';
 
 const quickActions = [
-  { label: 'Log Period', icon: Droplet, path: '/log/flow' },
+  { label: 'Log Flow', icon: Droplet, path: '/log/flow' },
   { label: 'Log Symptoms', icon: Activity, path: '/log/symptoms' },
   { label: 'Log Mood', icon: Smile, path: '/log/mood' },
 ];

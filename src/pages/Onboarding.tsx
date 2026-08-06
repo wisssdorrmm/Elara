@@ -63,7 +63,7 @@ export default function Onboarding() {
       if (profileError) throw new Error(profileError);
 
       if (lastPeriodStart) {
-        const { error: periodError } = await periodService.upsertPeriodForDate(user.id, lastPeriodStart, {});
+        const { error: periodError } = await periodService.createPeriod(user.id, { start_date: lastPeriodStart });
         if (periodError) throw new Error(periodError);
       }
 

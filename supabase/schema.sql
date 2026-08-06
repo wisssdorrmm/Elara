@@ -36,14 +36,14 @@ create table if not exists public.profiles (
 
 -- ============================================================
 -- periods
--- One row per logged period / cycle start.
+-- One row per period. Only start_date/end_date - flow lives on
+-- `logs` now (logged daily), never on the period itself.
 -- ============================================================
 create table if not exists public.periods (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users (id) on delete cascade,
   start_date date not null,
   end_date date,
-  flow text check (flow in ('light', 'medium', 'heavy', 'very_heavy')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (user_id, start_date)
@@ -54,15 +54,17 @@ create index if not exists periods_user_id_start_date_idx
 
 -- ============================================================
 -- logs
--- One row per day of logged symptoms / mood / notes.
+-- One row per day of logged flow / symptoms / mood / pain / sleep / notes.
 -- ============================================================
 create table if not exists public.logs (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid not null references auth.users (id) on delete cascade,
   log_date date not null,
+  flow text check (flow in ('spotting', 'light', 'medium', 'heavy', 'very_heavy')),
   symptoms text[] not null default '{}',
   mood text,
   pain_level smallint check (pain_level between 0 and 10),
+  sleep_hours numeric(4, 1) check (sleep_hours between 0 and 24),
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

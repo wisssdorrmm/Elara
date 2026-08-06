@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { differenceInCalendarDays, format } from 'date-fns';
-import { Droplets, Smile, Activity, FileText, Pencil, Trash2 } from 'lucide-react';
+import { Droplets, Smile, Activity, FileText, Pencil, Trash2, FileBarChart } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Dialog } from '@/components/ui/Dialog';
@@ -12,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { periodService } from '@/services/periodService';
 import { logService } from '@/services/logService';
 import { notify } from '@/utils/toast';
+import { FLOW_LABELS } from '@/constants';
 import type { Database } from '@/types';
 
 type Period = Database['public']['Tables']['periods']['Row'];
@@ -126,16 +128,40 @@ export default function CycleDetails() {
           </p>
           <div className="mt-2 flex items-center gap-2">
             {length && <Badge tone="primary">{length} day period</Badge>}
-            {period.flow && <Badge tone="danger">{period.flow.replace('_', ' ')} flow</Badge>}
+            {!period.end_date && <Badge tone="warning">Active</Badge>}
           </div>
+          {period.end_date && (
+            <Button
+              variant="ghost"
+              fullWidth={false}
+              className="mt-3 px-0"
+              icon={<FileBarChart className="h-4 w-4" />}
+              onClick={() => navigate(`/history/${period.id}/report`)}
+            >
+              View Cycle Report
+            </Button>
+          )}
         </Card>
 
         <Card>
           <div className="mb-3 flex items-center gap-2 text-text">
             <Droplets className="h-4 w-4 text-danger" />
-            <p className="font-semibold">Flow</p>
+            <p className="font-semibold">Flow timeline</p>
           </div>
-          <p className="text-sm text-text-muted">{period.flow ? period.flow.replace('_', ' ') : 'Not logged'}</p>
+          {logs.some((l) => l.flow) ? (
+            <div className="space-y-1.5">
+              {logs
+                .filter((l) => l.flow)
+                .map((l, i) => (
+                  <div key={l.id} className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">Day {i + 1}</span>
+                    <span className="font-medium text-text">{l.flow ? FLOW_LABELS[l.flow] : ''}</span>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p className="text-sm text-text-muted">Not logged</p>
+          )}
         </Card>
 
         <Card>

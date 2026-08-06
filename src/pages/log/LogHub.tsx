@@ -1,15 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { Droplet, Activity, Smile, Zap, Moon, Pill, FileText } from 'lucide-react';
+import { Calendar, Droplet, Activity, Smile, Zap, Moon, FileText } from 'lucide-react';
 
 const options = [
-  { label: 'Period', icon: Droplet, path: '/log/flow' },
+  { label: 'Period', icon: Calendar, path: '/log/period' },
+  { label: 'Flow', icon: Droplet, path: '/log/flow' },
   { label: 'Symptoms', icon: Activity, path: '/log/symptoms' },
   { label: 'Mood', icon: Smile, path: '/log/mood' },
-  { label: 'Flow', icon: Droplet, path: '/log/flow' },
-  { label: 'Pain', icon: Zap, path: '/log/symptoms' },
-  { label: 'Sleep', icon: Moon, path: '/log/symptoms' },
-  { label: 'Medication', icon: Pill, path: '/log/symptoms' },
-  { label: 'Notes', icon: FileText, path: '/log/symptoms' },
+  { label: 'Pain', icon: Zap, path: '/log/pain' },
+  { label: 'Sleep', icon: Moon, path: '/log/sleep' },
+  { label: 'Notes', icon: FileText, path: '/log/notes' },
 ];
 
 export default function LogHub() {
