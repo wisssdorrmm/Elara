@@ -14,27 +14,27 @@ export default function RelationshipDetails() {
   const { relationship, loading, error, refetch } = useRelationship();
   const [saving, setSaving] = useState(false);
 
-  const [nickname, setNickname] = useState('');
-  const [startedAt, setStartedAt] = useState('');
-  const [anniversaryDate, setAnniversaryDate] = useState('');
-  const [firstDateAt, setFirstDateAt] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [anniversary, setAnniversary] = useState('');
+  const [partnerBirthday, setPartnerBirthday] = useState('');
+  const [firstDate, setFirstDate] = useState('');
 
   useEffect(() => {
     if (!relationship) return;
-    setNickname(relationship.nickname ?? '');
-    setStartedAt(relationship.started_at);
-    setAnniversaryDate(relationship.anniversary_date ?? '');
-    setFirstDateAt(relationship.first_date_at ?? '');
+    setStartDate(relationship.relationship_start_date);
+    setAnniversary(relationship.anniversary ?? '');
+    setPartnerBirthday(relationship.partner_birthday ?? '');
+    setFirstDate(relationship.first_date ?? '');
   }, [relationship]);
 
   const handleSave = async () => {
     if (!relationship) return;
     setSaving(true);
     const { error: saveError } = await coupleService.updateRelationship(relationship.id, {
-      nickname: nickname || null,
-      started_at: startedAt,
-      anniversary_date: anniversaryDate || null,
-      first_date_at: firstDateAt || null,
+      relationship_start_date: startDate,
+      anniversary: anniversary || null,
+      partner_birthday: partnerBirthday || null,
+      first_date: firstDate || null,
     });
     setSaving(false);
     if (saveError) {
@@ -53,25 +53,15 @@ export default function RelationshipDetails() {
     <div>
       <Navbar showBack title="Relationship Details" />
       <div className="app-page space-y-5 pt-0">
+        <Input label="Relationship start date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        <Input label="Anniversary" type="date" value={anniversary} onChange={(e) => setAnniversary(e.target.value)} />
         <Input
-          label="Relationship nickname"
-          placeholder="e.g. Us, Team Smith..."
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-        />
-        <Input label="Relationship start date" type="date" value={startedAt} onChange={(e) => setStartedAt(e.target.value)} />
-        <Input
-          label="Anniversary"
+          label="Partner's birthday"
           type="date"
-          value={anniversaryDate}
-          onChange={(e) => setAnniversaryDate(e.target.value)}
+          value={partnerBirthday}
+          onChange={(e) => setPartnerBirthday(e.target.value)}
         />
-        <Input
-          label="First date (optional)"
-          type="date"
-          value={firstDateAt}
-          onChange={(e) => setFirstDateAt(e.target.value)}
-        />
+        <Input label="First date (optional)" type="date" value={firstDate} onChange={(e) => setFirstDate(e.target.value)} />
 
         <Button loading={saving} onClick={handleSave}>
           Save

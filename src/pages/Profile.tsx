@@ -59,7 +59,7 @@ export default function Profile() {
               {relationship ? (
                 <>
                   <p className="text-sm text-white/80">Together for</p>
-                  <p className="font-semibold">{formatRelationshipDuration(relationship.started_at)}</p>
+                  <p className="font-semibold">{formatRelationshipDuration(relationship.relationship_start_date)}</p>
                 </>
               ) : (
                 <>

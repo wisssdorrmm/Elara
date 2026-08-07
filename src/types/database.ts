@@ -7,7 +7,6 @@ export type CycleGoal =
 
 export type FlowIntensity = 'spotting' | 'light' | 'medium' | 'heavy' | 'very_heavy';
 
-export type InviteStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 export type RelationshipStatus = 'active' | 'ended';
 
 export interface Database {
@@ -74,16 +73,18 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['logs']['Row']>;
         Relationships: [];
       };
+      /** Matches the LIVE table exactly - state is (revoked, accepted_at, accepted_by), not a status enum. */
       couple_invites: {
         Row: {
           id: string;
           inviter_id: string;
           invite_code: string;
-          status: InviteStatus;
+          revoked: boolean;
           created_at: string;
           expires_at: string;
           accepted_by: string | null;
           accepted_at: string | null;
+          relationship_id: string | null;
         };
         Insert: Partial<Omit<Database['public']['Tables']['couple_invites']['Row'], 'id' | 'created_at'>> & {
           inviter_id: string;
@@ -93,24 +94,24 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['couple_invites']['Row']>;
         Relationships: [];
       };
+      /** Matches the LIVE table exactly - user_one_id/user_two_id, no nickname/ended_at columns. */
       relationships: {
         Row: {
           id: string;
-          user_a_id: string;
-          user_b_id: string;
+          user_one_id: string;
+          user_two_id: string;
           status: RelationshipStatus;
-          started_at: string;
-          anniversary_date: string | null;
-          first_date_at: string | null;
-          nickname: string | null;
+          relationship_start_date: string;
+          anniversary: string | null;
+          partner_birthday: string | null;
+          first_date: string | null;
           created_at: string;
           updated_at: string;
-          ended_at: string | null;
         };
         Insert: Partial<Omit<Database['public']['Tables']['relationships']['Row'], 'id' | 'created_at' | 'updated_at'>> & {
-          user_a_id: string;
-          user_b_id: string;
-          started_at: string;
+          user_one_id: string;
+          user_two_id: string;
+          relationship_start_date: string;
         };
         Update: Partial<Database['public']['Tables']['relationships']['Row']>;
         Relationships: [];
@@ -118,9 +119,10 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      /** Live function returns just the new relationship's uuid, not a full row. */
       accept_couple_invite: {
         Args: { invite: string };
-        Returns: Database['public']['Tables']['relationships']['Row'];
+        Returns: string;
       };
     };
     Enums: Record<string, never>;

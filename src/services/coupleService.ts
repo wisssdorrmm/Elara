@@ -37,12 +37,14 @@ export const coupleService = {
     return { data: null, error: 'Could not generate a unique invite code. Please try again.' };
   },
 
+  /** "Pending" here means: not revoked, not yet accepted, not yet expired - there's no status enum on this table. */
   async getMyPendingInvite(inviterId: string): Promise<ServiceResult<CoupleInvite>> {
     const { data, error } = await supabase
       .from('couple_invites')
       .select('*')
       .eq('inviter_id', inviterId)
-      .eq('status', 'pending')
+      .eq('revoked', false)
+      .is('accepted_at', null)
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
@@ -52,12 +54,17 @@ export const coupleService = {
   },
 
   async revokeInvite(inviteId: string): Promise<ServiceResult> {
-    const { error } = await supabase.from('couple_invites').update({ status: 'revoked' }).eq('id', inviteId);
+    const { error } = await supabase.from('couple_invites').update({ revoked: true }).eq('id', inviteId);
     return { data: null, error: error?.message ?? null };
   },
 
-  /** Accepts an invite via the secure RPC function - never reads other users' invites directly. */
-  async acceptInvite(code: string): Promise<ServiceResult<Relationship>> {
+  /**
+   * Accepts an invite via the secure RPC function - never reads other users'
+   * invites directly. The live function only returns the new relationship's
+   * id (not a full row), so callers should refetch via getMyRelationship
+   * after this succeeds if they need the full record.
+   */
+  async acceptInvite(code: string): Promise<ServiceResult<string>> {
     const { data, error } = await supabase.rpc('accept_couple_invite', { invite: code.trim().toUpperCase() });
     if (error) return { data: null, error: error.message };
     return { data, error: null };
@@ -68,7 +75,7 @@ export const coupleService = {
       .from('relationships')
       .select('*')
       .eq('status', 'active')
-      .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
+      .or(`user_one_id.eq.${userId},user_two_id.eq.${userId}`)
       .maybeSingle();
     if (error) return { data: null, error: error.message };
     return { data, error: null };
@@ -80,10 +87,11 @@ export const coupleService = {
     return { data, error: null };
   },
 
+  /** Live table has no ended_at column - status alone tracks this. */
   async endRelationship(id: string): Promise<ServiceResult<Relationship>> {
     const { data, error } = await supabase
       .from('relationships')
-      .update({ status: 'ended', ended_at: new Date().toISOString() })
+      .update({ status: 'ended' })
       .eq('id', id)
       .select()
       .single();

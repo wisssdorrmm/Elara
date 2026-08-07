@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Pencil, Flame, Trophy, Calendar, Gift, MessageCircle, BarChart3, Cake, Unlink } from 'lucide-react';
+import { Heart, Pencil, Flame, Trophy, Calendar, Gift, MessageCircle, BarChart3, Cake, PartyPopper, Unlink } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -57,12 +57,13 @@ export default function CoupleDashboard() {
     );
   }
 
-  const daysToAnniversary = daysUntilNextAnnualDate(relationship.anniversary_date);
+  const daysToAnniversary = daysUntilNextAnnualDate(relationship.anniversary);
+  const daysToPartnerBirthday = daysUntilNextAnnualDate(relationship.partner_birthday);
 
   return (
     <div>
       <Navbar
-        title={relationship.nickname || 'Your Relationship'}
+        title="Your Relationship"
         showBack
         right={
           <button
@@ -81,7 +82,7 @@ export default function CoupleDashboard() {
             <Heart className="h-5 w-5" />
           </span>
           <p className="text-sm text-white/80">Together for</p>
-          <p className="text-xl font-bold">{formatRelationshipDuration(relationship.started_at)}</p>
+          <p className="text-xl font-bold">{formatRelationshipDuration(relationship.relationship_start_date)}</p>
         </Card>
 
         {daysToAnniversary !== null && (
@@ -94,6 +95,24 @@ export default function CoupleDashboard() {
                 <p className="text-sm text-text-muted">Next anniversary</p>
                 <p className="font-semibold text-text">
                   {daysToAnniversary === 0 ? 'Today! 🎉' : `In ${daysToAnniversary} day${daysToAnniversary > 1 ? 's' : ''}`}
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {daysToPartnerBirthday !== null && (
+          <Card>
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <PartyPopper className="h-5 w-5 text-primary" />
+              </span>
+              <div>
+                <p className="text-sm text-text-muted">Partner's birthday</p>
+                <p className="font-semibold text-text">
+                  {daysToPartnerBirthday === 0
+                    ? 'Today! 🎉'
+                    : `In ${daysToPartnerBirthday} day${daysToPartnerBirthday > 1 ? 's' : ''}`}
                 </p>
               </div>
             </div>
