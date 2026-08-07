@@ -1,0 +1,17 @@
+{
+  "name": "Ellara",
+  "short_name": "Ellara",
+  "description": "Ellara — your cycle, your relationship, your wellness, together.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F5FF",
+  "theme_color": "#7C3AED",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

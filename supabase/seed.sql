@@ -1,4 +1,4 @@
--- HerCycle seed data (optional, for local development only)
+-- Ellara seed data (optional, for local development only)
 -- Replace :'seed_user_id' with a real auth.users.id from your Supabase project
 -- (Authentication > Users) before running, e.g. via psql:
 --   psql "$DATABASE_URL" -v seed_user_id="'00000000-0000-0000-0000-000000000000'" -f seed.sql

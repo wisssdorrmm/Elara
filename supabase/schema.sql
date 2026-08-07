@@ -1,4 +1,4 @@
--- HerCycle database schema
+-- Ellara database schema
 -- Run this first, then policies.sql, then optionally seed.sql
 
 create extension if not exists "uuid-ossp";

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Bell, Shield, HelpCircle, Info, ChevronRight, Pencil } from 'lucide-react';
+import { Calendar, Bell, Shield, HelpCircle, Info, ChevronRight, Pencil, Heart } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -7,16 +7,19 @@ import { SkeletonCard } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { useRelationship } from '@/hooks/useRelationship';
+import { formatRelationshipDuration } from '@/utils/relationship';
 
 const menuItems = [
   { label: 'Privacy', icon: Shield, path: '/settings' },
   { label: 'Help & support', icon: HelpCircle, path: '/settings' },
-  { label: 'About HerCycle', icon: Info, path: '/settings' },
+  { label: 'About Ellara', icon: Info, path: '/settings' },
 ];
 
 export default function Profile() {
   const { user, signOut } = useAuth();
   const { profile, loading, error, refetch } = useProfile();
+  const { relationship, loading: relationshipLoading } = useRelationship();
   const navigate = useNavigate();
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'User';
@@ -40,6 +43,35 @@ export default function Profile() {
           <p className="text-sm text-text-muted">{user?.email}</p>
         </div>
       </div>
+
+      {!relationshipLoading && (
+        <Card
+          interactive
+          onClick={() => navigate(relationship ? '/couple/dashboard' : '/couple')}
+          className="bg-gradient-to-br from-primary to-secondary text-white"
+          role="button"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
+              <Heart className="h-5 w-5" />
+            </span>
+            <div className="flex-1">
+              {relationship ? (
+                <>
+                  <p className="text-sm text-white/80">Together for</p>
+                  <p className="font-semibold">{formatRelationshipDuration(relationship.started_at)}</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold">Couple Connect</p>
+                  <p className="text-sm text-white/80">Connect with your partner</p>
+                </>
+              )}
+            </div>
+            <ChevronRight className="h-5 w-5 text-white/70" />
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div className="grid grid-cols-2 gap-4 text-sm">

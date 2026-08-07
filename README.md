@@ -1,4 +1,4 @@
-# HerCycle
+# Ellara
 
 A calming, modern women's health app for tracking your menstrual cycle, predicting periods, logging symptoms and moods, and staying on top of reminders. Built as a mobile-first Progressive Web App — designed to feel like **Apple Health meets Notion**, not a clinical medical tool.
 

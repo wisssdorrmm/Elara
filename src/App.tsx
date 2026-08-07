@@ -28,6 +28,10 @@ import PeriodReport from '@/pages/history/PeriodReport';
 import Profile from '@/pages/Profile';
 import EditProfile from '@/pages/EditProfile';
 import Settings from '@/pages/Settings';
+import CoupleConnect from '@/pages/couple/CoupleConnect';
+import AcceptInvite from '@/pages/couple/AcceptInvite';
+import CoupleDashboard from '@/pages/couple/CoupleDashboard';
+import RelationshipDetails from '@/pages/couple/RelationshipDetails';
 import NotFound from '@/pages/NotFound';
 
 export default function App() {
@@ -43,6 +47,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/couple/accept" element={<AcceptInvite />} />
 
         {/* Protected routes, wrapped in the app shell (content + bottom nav) */}
         <Route
@@ -188,6 +193,30 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple"
+          element={
+            <ProtectedRoute>
+              <CoupleConnect />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/dashboard"
+          element={
+            <ProtectedRoute>
+              <CoupleDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/details"
+          element={
+            <ProtectedRoute>
+              <RelationshipDetails />
             </ProtectedRoute>
           }
         />

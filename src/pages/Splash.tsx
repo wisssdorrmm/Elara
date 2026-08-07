@@ -34,7 +34,7 @@ export default function Splash() {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="text-center"
       >
-        <h1 className="text-2xl font-bold">HerCycle</h1>
+        <h1 className="text-2xl font-bold">Ellara</h1>
         <p className="mt-1 text-sm text-white/80">Understand your cycle. Empower your life.</p>
       </motion.div>
 

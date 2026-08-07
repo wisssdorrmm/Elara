@@ -11,7 +11,7 @@ export default function Landing() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
-          <span className="text-lg font-semibold">HerCycle</span>
+          <span className="text-lg font-semibold">Ellara</span>
         </div>
       </motion.div>
 

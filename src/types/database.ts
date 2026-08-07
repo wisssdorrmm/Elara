@@ -7,6 +7,9 @@ export type CycleGoal =
 
 export type FlowIntensity = 'spotting' | 'light' | 'medium' | 'heavy' | 'very_heavy';
 
+export type InviteStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
+export type RelationshipStatus = 'active' | 'ended';
+
 export interface Database {
   public: {
     Tables: {
@@ -71,9 +74,55 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['logs']['Row']>;
         Relationships: [];
       };
+      couple_invites: {
+        Row: {
+          id: string;
+          inviter_id: string;
+          invite_code: string;
+          status: InviteStatus;
+          created_at: string;
+          expires_at: string;
+          accepted_by: string | null;
+          accepted_at: string | null;
+        };
+        Insert: Partial<Omit<Database['public']['Tables']['couple_invites']['Row'], 'id' | 'created_at'>> & {
+          inviter_id: string;
+          invite_code: string;
+          expires_at: string;
+        };
+        Update: Partial<Database['public']['Tables']['couple_invites']['Row']>;
+        Relationships: [];
+      };
+      relationships: {
+        Row: {
+          id: string;
+          user_a_id: string;
+          user_b_id: string;
+          status: RelationshipStatus;
+          started_at: string;
+          anniversary_date: string | null;
+          first_date_at: string | null;
+          nickname: string | null;
+          created_at: string;
+          updated_at: string;
+          ended_at: string | null;
+        };
+        Insert: Partial<Omit<Database['public']['Tables']['relationships']['Row'], 'id' | 'created_at' | 'updated_at'>> & {
+          user_a_id: string;
+          user_b_id: string;
+          started_at: string;
+        };
+        Update: Partial<Database['public']['Tables']['relationships']['Row']>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      accept_couple_invite: {
+        Args: { p_invite_code: string };
+        Returns: Database['public']['Tables']['relationships']['Row'];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

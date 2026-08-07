@@ -1,4 +1,4 @@
--- HerCycle Row Level Security policies
+-- Ellara Row Level Security policies
 -- Run after schema.sql. Ensures every user can only ever read/write their own rows.
 
 alter table public.profiles enable row level security;

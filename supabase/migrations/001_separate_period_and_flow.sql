@@ -1,4 +1,4 @@
--- HerCycle migration: Part 5 - separate Period and Flow
+-- Ellara migration: Part 5 - separate Period and Flow
 -- Run this ONCE against your existing live Supabase project's SQL Editor.
 -- Safe to run even if some steps were already applied (uses IF EXISTS/IF NOT EXISTS).
 
