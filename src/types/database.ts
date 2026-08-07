@@ -119,7 +119,7 @@ export interface Database {
     Views: Record<string, never>;
     Functions: {
       accept_couple_invite: {
-        Args: { p_invite_code: string };
+        Args: { invite: string };
         Returns: Database['public']['Tables']['relationships']['Row'];
       };
     };

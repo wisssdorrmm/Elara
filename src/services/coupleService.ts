@@ -58,7 +58,7 @@ export const coupleService = {
 
   /** Accepts an invite via the secure RPC function - never reads other users' invites directly. */
   async acceptInvite(code: string): Promise<ServiceResult<Relationship>> {
-    const { data, error } = await supabase.rpc('accept_couple_invite', { p_invite_code: code.trim().toUpperCase() });
+    const { data, error } = await supabase.rpc('accept_couple_invite', { invite: code.trim().toUpperCase() });
     if (error) return { data: null, error: error.message };
     return { data, error: null };
   },
