@@ -28,6 +28,7 @@ import PeriodReport from '@/pages/history/PeriodReport';
 import Profile from '@/pages/Profile';
 import EditProfile from '@/pages/EditProfile';
 import Settings from '@/pages/Settings';
+import Notifications from '@/pages/Notifications';
 import CoupleConnect from '@/pages/couple/CoupleConnect';
 import AcceptInvite from '@/pages/couple/AcceptInvite';
 import CoupleDashboard from '@/pages/couple/CoupleDashboard';
@@ -200,7 +201,9 @@ export default function App() {
           path="/couple"
           element={
             <ProtectedRoute>
-              <CoupleConnect />
+              <AppShell>
+                <CoupleConnect />
+              </AppShell>
             </ProtectedRoute>
           }
         />
@@ -208,7 +211,9 @@ export default function App() {
           path="/couple/dashboard"
           element={
             <ProtectedRoute>
-              <CoupleDashboard />
+              <AppShell>
+                <CoupleDashboard />
+              </AppShell>
             </ProtectedRoute>
           }
         />
@@ -217,6 +222,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RelationshipDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
             </ProtectedRoute>
           }
         />

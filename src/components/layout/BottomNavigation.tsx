@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Plus, Clock, User } from 'lucide-react';
+import { Home, Calendar, Plus, Heart, User } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 const tabs = [
   { path: '/dashboard', label: 'Home', icon: Home },
   { path: '/calendar', label: 'Calendar', icon: Calendar },
   { path: '/log', label: 'Log', icon: Plus, isCentral: true },
-  { path: '/history', label: 'History', icon: Clock },
+  { path: '/couple', label: 'Couple', icon: Heart },
   { path: '/profile', label: 'Profile', icon: User },
 ];
 

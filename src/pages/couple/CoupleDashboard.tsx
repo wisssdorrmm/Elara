@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Pencil, Flame, Trophy, Calendar, Gift, MessageCircle, BarChart3, Cake, PartyPopper, Unlink } from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -46,13 +45,11 @@ export default function CoupleDashboard() {
   if (error) return <ErrorState message="We couldn't load your couple dashboard." onRetry={refetch} />;
   if (!relationship) {
     return (
-      <div>
-        <Navbar title="Couple" showBack />
-        <div className="app-page pt-0 text-center">
-          <p className="mb-2 font-semibold text-text">Not connected yet</p>
-          <p className="mb-6 text-text-muted">Connect with your partner to unlock the couple dashboard.</p>
-          <Button onClick={() => navigate('/couple')}>Connect with Partner</Button>
-        </div>
+      <div className="space-y-5 text-center">
+        <h1 className="text-xl font-bold text-text">Couple</h1>
+        <p className="mb-2 font-semibold text-text">Not connected yet</p>
+        <p className="mb-6 text-text-muted">Connect with your partner to unlock the couple dashboard.</p>
+        <Button onClick={() => navigate('/couple')}>Connect with Partner</Button>
       </div>
     );
   }
@@ -61,86 +58,81 @@ export default function CoupleDashboard() {
   const daysToPartnerBirthday = daysUntilNextAnnualDate(relationship.partner_birthday);
 
   return (
-    <div>
-      <Navbar
-        title="Your Relationship"
-        showBack
-        right={
-          <button
-            onClick={() => navigate('/couple/details')}
-            aria-label="Edit relationship details"
-            className="rounded-full p-2 text-text-muted hover:bg-black/5"
-          >
-            <Pencil className="h-4.5 w-4.5" />
-          </button>
-        }
-      />
-
-      <div className="app-page space-y-4 pt-0">
-        <Card className="bg-gradient-to-br from-primary to-secondary text-center text-white">
-          <span className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
-            <Heart className="h-5 w-5" />
-          </span>
-          <p className="text-sm text-white/80">Together for</p>
-          <p className="text-xl font-bold">{formatRelationshipDuration(relationship.relationship_start_date)}</p>
-        </Card>
-
-        {daysToAnniversary !== null && (
-          <Card>
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Cake className="h-5 w-5 text-primary" />
-              </span>
-              <div>
-                <p className="text-sm text-text-muted">Next anniversary</p>
-                <p className="font-semibold text-text">
-                  {daysToAnniversary === 0 ? 'Today! 🎉' : `In ${daysToAnniversary} day${daysToAnniversary > 1 ? 's' : ''}`}
-                </p>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {daysToPartnerBirthday !== null && (
-          <Card>
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <PartyPopper className="h-5 w-5 text-primary" />
-              </span>
-              <div>
-                <p className="text-sm text-text-muted">Partner's birthday</p>
-                <p className="font-semibold text-text">
-                  {daysToPartnerBirthday === 0
-                    ? 'Today! 🎉'
-                    : `In ${daysToPartnerBirthday} day${daysToPartnerBirthday > 1 ? 's' : ''}`}
-                </p>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        <div className="grid grid-cols-2 gap-3">
-          {comingSoonCards.map(({ label, icon: Icon, description }) => (
-            <Card key={label} padding="sm" className="relative">
-              <Badge tone="neutral" className="absolute right-3 top-3 text-[10px]">
-                Soon
-              </Badge>
-              <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                <Icon className="h-4 w-4 text-primary" />
-              </span>
-              <p className="text-sm font-semibold text-text">{label}</p>
-              <p className="text-xs text-text-muted">{description}</p>
-            </Card>
-          ))}
-        </div>
-
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-text">Your Relationship</h1>
         <button
-          onClick={() => setDisconnectOpen(true)}
-          className="flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-danger"
+          onClick={() => navigate('/couple/details')}
+          aria-label="Edit relationship details"
+          className="rounded-full p-2 text-text-muted hover:bg-black/5"
         >
-          <Unlink className="h-4 w-4" /> Disconnect
+          <Pencil className="h-4.5 w-4.5" />
         </button>
       </div>
+
+      <Card className="bg-gradient-to-br from-primary to-secondary text-center text-white">
+        <span className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
+          <Heart className="h-5 w-5" />
+        </span>
+        <p className="text-sm text-white/80">Together for</p>
+        <p className="text-xl font-bold">{formatRelationshipDuration(relationship.relationship_start_date)}</p>
+      </Card>
+
+      {daysToAnniversary !== null && (
+        <Card>
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+              <Cake className="h-5 w-5 text-primary" />
+            </span>
+            <div>
+              <p className="text-sm text-text-muted">Next anniversary</p>
+              <p className="font-semibold text-text">
+                {daysToAnniversary === 0 ? 'Today! 🎉' : `In ${daysToAnniversary} day${daysToAnniversary > 1 ? 's' : ''}`}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {daysToPartnerBirthday !== null && (
+        <Card>
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+              <PartyPopper className="h-5 w-5 text-primary" />
+            </span>
+            <div>
+              <p className="text-sm text-text-muted">Partner's birthday</p>
+              <p className="font-semibold text-text">
+                {daysToPartnerBirthday === 0
+                  ? 'Today! 🎉'
+                  : `In ${daysToPartnerBirthday} day${daysToPartnerBirthday > 1 ? 's' : ''}`}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-2 gap-3">
+        {comingSoonCards.map(({ label, icon: Icon, description }) => (
+          <Card key={label} padding="sm" className="relative">
+            <Badge tone="neutral" className="absolute right-3 top-3 text-[10px]">
+              Soon
+            </Badge>
+            <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+              <Icon className="h-4 w-4 text-primary" />
+            </span>
+            <p className="text-sm font-semibold text-text">{label}</p>
+            <p className="text-xs text-text-muted">{description}</p>
+          </Card>
+        ))}
+      </div>
+
+      <button
+        onClick={() => setDisconnectOpen(true)}
+        className="flex w-full items-center justify-center gap-1.5 py-3 text-sm font-medium text-danger"
+      >
+        <Unlink className="h-4 w-4" /> Disconnect
+      </button>
 
       <Dialog
         open={disconnectOpen}

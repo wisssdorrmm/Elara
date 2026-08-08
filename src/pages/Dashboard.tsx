@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Droplet, Activity, Smile } from 'lucide-react';
+import { Droplet, Activity, Smile, Bell } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -34,9 +34,18 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="space-y-5">
-        <div>
-          <h1 className="text-xl font-bold text-text">Hello, {firstName} 👋</h1>
-          <p className="text-sm text-text-muted">Today, {format(new Date(), 'MMM d')}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-text">Hello, {firstName} 👋</h1>
+            <p className="text-sm text-text-muted">Today, {format(new Date(), 'MMM d')}</p>
+          </div>
+          <button
+            onClick={() => navigate('/notifications')}
+            aria-label="Notifications"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-card"
+          >
+            <Bell className="h-5 w-5" />
+          </button>
         </div>
         <SkeletonCard />
       </div>
@@ -59,9 +68,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-xl font-bold text-text">Hello, {firstName} 👋</h1>
-        <p className="text-sm text-text-muted">Today, {format(new Date(), 'MMM d')}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-text">Hello, {firstName} 👋</h1>
+          <p className="text-sm text-text-muted">Today, {format(new Date(), 'MMM d')}</p>
+        </div>
+        <button
+          onClick={() => navigate('/notifications')}
+          aria-label="Notifications"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-card"
+        >
+          <Bell className="h-5 w-5" />
+        </button>
       </div>
 
       {stats.cycleDay && stats.nextPeriodDate ? (
