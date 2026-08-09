@@ -33,7 +33,6 @@ import CoupleConnect from '@/pages/couple/CoupleConnect';
 import AcceptInvite from '@/pages/couple/AcceptInvite';
 import CoupleDashboard from '@/pages/couple/CoupleDashboard';
 import RelationshipDetails from '@/pages/couple/RelationshipDetails';
-import CoupleMemories from '@/pages/couple/CoupleMemories';
 import NotFound from '@/pages/NotFound';
 
 export default function App() {
@@ -215,14 +214,6 @@ export default function App() {
               <AppShell>
                 <CoupleDashboard />
               </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/couple/memories"
-          element={
-            <ProtectedRoute>
-              <CoupleMemories />
             </ProtectedRoute>
           }
         />
