@@ -9,6 +9,7 @@ import { Dialog } from '@/components/ui/Dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useRelationship } from '@/hooks/useRelationship';
 import { coupleService } from '@/services/coupleService';
+import { coupleEngagementService } from '@/services/coupleEngagementService';
 import { notify } from '@/utils/toast';
 import type { Database } from '@/types/database';
 
@@ -96,12 +97,13 @@ export default function CoupleConnect() {
   const handleAccept = async () => {
     if (!codeInput.trim()) return;
     setAccepting(true);
-    const { error } = await coupleService.acceptInvite(codeInput);
+    const { data: relationshipId, error } = await coupleService.acceptInvite(codeInput);
     setAccepting(false);
     if (error) {
       notify.error(error);
       return;
     }
+    if (relationshipId) coupleEngagementService.notifyRelationshipConnected(relationshipId);
     notify.success("You're connected!");
     navigate('/couple/dashboard');
   };

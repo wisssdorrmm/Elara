@@ -33,6 +33,10 @@ import CoupleConnect from '@/pages/couple/CoupleConnect';
 import AcceptInvite from '@/pages/couple/AcceptInvite';
 import CoupleDashboard from '@/pages/couple/CoupleDashboard';
 import RelationshipDetails from '@/pages/couple/RelationshipDetails';
+import DailyCheckin from '@/pages/couple/DailyCheckin';
+import LogDate from '@/pages/couple/LogDate';
+import Timeline from '@/pages/couple/Timeline';
+import WeeklySummary from '@/pages/couple/WeeklySummary';
 import NotFound from '@/pages/NotFound';
 
 export default function App() {
@@ -222,6 +226,38 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RelationshipDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/checkin"
+          element={
+            <ProtectedRoute>
+              <DailyCheckin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/dates/new"
+          element={
+            <ProtectedRoute>
+              <LogDate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/timeline"
+          element={
+            <ProtectedRoute>
+              <Timeline />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/summary"
+          element={
+            <ProtectedRoute>
+              <WeeklySummary />
             </ProtectedRoute>
           }
         />

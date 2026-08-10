@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { coupleService } from '@/services/coupleService';
+import { coupleEngagementService } from '@/services/coupleEngagementService';
 import { notify } from '@/utils/toast';
 
 export default function AcceptInvite() {
@@ -30,12 +31,13 @@ export default function AcceptInvite() {
   const handleAccept = async () => {
     if (!code.trim() || !user) return;
     setAccepting(true);
-    const { error } = await coupleService.acceptInvite(code);
+    const { data: relationshipId, error } = await coupleService.acceptInvite(code);
     setAccepting(false);
     if (error) {
       notify.error(error);
       return;
     }
+    if (relationshipId) coupleEngagementService.notifyRelationshipConnected(relationshipId);
     notify.success("You're connected!");
     navigate('/couple/dashboard');
   };

@@ -1,4 +1,4 @@
-import type { FlowIntensity } from '@/types';
+import type { FlowIntensity, CheckinFeeling, PartnerAlertType } from '@/types';
 
 /** Days-before-period options shown when picking reminder preferences. 0 = "on the day". */
 export const REMINDER_DAY_OPTIONS = [10, 7, 5, 3, 1, 0] as const;
@@ -7,6 +7,68 @@ export function formatReminderDayLabel(day: number): string {
   if (day === 0) return 'On the day';
   return `${day} day${day > 1 ? 's' : ''} before`;
 }
+
+// ============================================================================
+// Part 7 — Couple platform constants. Definitions live here (frontend), not
+// in the database, matching the SQL migration's design (badge_key/
+// challenge_key/alert_type are just text keys in the DB; labels/emoji are
+// resolved client-side, same pattern as FLOW_OPTIONS/MOOD_OPTIONS above).
+// ============================================================================
+
+export const CHECKIN_FEELING_OPTIONS: { value: CheckinFeeling; label: string; emoji: string }[] = [
+  { value: 'loved', label: 'Loved', emoji: '❤️' },
+  { value: 'happy', label: 'Happy', emoji: '😊' },
+  { value: 'supported', label: 'Supported', emoji: '🤗' },
+  { value: 'appreciated', label: 'Appreciated', emoji: '🙏' },
+  { value: 'peaceful', label: 'Peaceful', emoji: '😌' },
+  { value: 'hurt', label: 'Hurt', emoji: '😔' },
+  { value: 'ignored', label: 'Ignored', emoji: '😴' },
+  { value: 'sad', label: 'Sad', emoji: '😢' },
+];
+
+export const CHECKIN_FEELING_LABELS: Record<CheckinFeeling, string> = {
+  loved: 'Loved',
+  happy: 'Happy',
+  supported: 'Supported',
+  appreciated: 'Appreciated',
+  peaceful: 'Peaceful',
+  hurt: 'Hurt',
+  ignored: 'Ignored',
+  sad: 'Sad',
+};
+
+export const APPRECIATION_PRESETS = [
+  'Thank you for being there.',
+  'I appreciate you.',
+  'You made my day better.',
+  "I'm grateful for you.",
+  'You mean so much to me.',
+];
+
+export const PARTNER_ALERT_OPTIONS: { value: PartnerAlertType; label: string }[] = [
+  { value: 'thinking_of_you', label: '❤️ Thinking of you' },
+  { value: 'sending_love', label: '💕 Sending you love' },
+  { value: 'im_here_for_you', label: "🫶 I'm here for you" },
+  { value: 'hope_good_day', label: '😊 Hope you\'re having a good day' },
+  { value: 'feeling_down', label: "🥺 I'm feeling down" },
+  { value: 'call_me', label: '📞 Call me' },
+];
+
+export const BADGE_DEFINITIONS: Record<string, { label: string; emoji: string; description: string }> = {
+  first_checkin: { label: 'First Check-in', emoji: '❤️', description: 'Completed your first daily check-in' },
+  streak_7: { label: '7 Day Streak', emoji: '🔥', description: 'Checked in for 7 days in a row' },
+  streak_30: { label: '30 Day Streak', emoji: '🔥', description: 'Checked in for 30 days in a row' },
+  appreciation_master: { label: 'Appreciation Master', emoji: '💌', description: 'Sent 10 appreciations' },
+  challenge_champion: { label: 'Challenge Champion', emoji: '🏆', description: 'Completed a weekly challenge' },
+};
+
+export const WEEKLY_CHALLENGE_DEFINITIONS: Record<string, { title: string; description: string }> = {
+  meaningful_conversation: { title: 'Have a meaningful conversation', description: 'Talk about something that matters to you both.' },
+  give_appreciation: { title: 'Give each other appreciation', description: 'Send your partner an appreciation message.' },
+  plan_a_date: { title: 'Plan a date', description: 'Plan and log a date together.' },
+  daily_checkins: { title: 'Complete daily check-ins', description: "Check in with how you're feeling for a few days this week." },
+  thoughtful_gesture: { title: 'Do something thoughtful', description: 'Surprise your partner with a small, thoughtful gesture.' },
+};
 
 export interface FlowOption {
   value: FlowIntensity;

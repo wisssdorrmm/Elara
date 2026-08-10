@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Droplet, Activity, Smile, Bell } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { Avatar } from '@/components/ui/Avatar';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { CycleCard } from '@/components/CycleCard';
@@ -9,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { usePeriods } from '@/hooks/usePeriods';
 import { useLogs } from '@/hooks/useLogs';
+import { useNotifications } from '@/hooks/useNotifications';
 import { computeCycleStats } from '@/utils/cycle';
 
 const quickActions = [
@@ -22,14 +24,36 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading, error: profileError, refetch: refetchProfile } = useProfile();
   const { periods, loading: periodsLoading, error: periodsError, refetch: refetchPeriods } = usePeriods();
+  const { unreadCount } = useNotifications();
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const { logs, loading: logsLoading } = useLogs(today, today);
   const todayLog = logs[0];
 
   const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+  const displayName = profile?.full_name || user?.email || 'there';
   const loading = profileLoading || periodsLoading;
   const error = profileError || periodsError;
+
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => navigate('/notifications')}
+        aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
+        className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-card"
+      >
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </button>
+      <button onClick={() => navigate('/profile')} aria-label="Open profile">
+        <Avatar name={displayName} size="sm" />
+      </button>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -39,13 +63,7 @@ export default function Dashboard() {
             <h1 className="text-xl font-bold text-text">Hello, {firstName} 👋</h1>
             <p className="text-sm text-text-muted">Today, {format(new Date(), 'MMM d')}</p>
           </div>
-          <button
-            onClick={() => navigate('/notifications')}
-            aria-label="Notifications"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-card"
-          >
-            <Bell className="h-5 w-5" />
-          </button>
+          {headerActions}
         </div>
         <SkeletonCard />
       </div>
@@ -73,13 +91,7 @@ export default function Dashboard() {
           <h1 className="text-xl font-bold text-text">Hello, {firstName} 👋</h1>
           <p className="text-sm text-text-muted">Today, {format(new Date(), 'MMM d')}</p>
         </div>
-        <button
-          onClick={() => navigate('/notifications')}
-          aria-label="Notifications"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-card"
-        >
-          <Bell className="h-5 w-5" />
-        </button>
+        {headerActions}
       </div>
 
       {stats.cycleDay && stats.nextPeriodDate ? (

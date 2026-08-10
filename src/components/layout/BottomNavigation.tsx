@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Plus, Heart, User } from 'lucide-react';
+import { Home, Calendar, Plus, Heart } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 const tabs = [
@@ -7,7 +7,6 @@ const tabs = [
   { path: '/calendar', label: 'Calendar', icon: Calendar },
   { path: '/log', label: 'Log', icon: Plus, isCentral: true },
   { path: '/couple', label: 'Couple', icon: Heart },
-  { path: '/profile', label: 'Profile', icon: User },
 ];
 
 export function BottomNavigation() {
