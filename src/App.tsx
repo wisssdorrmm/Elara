@@ -28,6 +28,7 @@ import PeriodReport from '@/pages/history/PeriodReport';
 import Profile from '@/pages/Profile';
 import EditProfile from '@/pages/EditProfile';
 import Settings from '@/pages/Settings';
+import Insights from '@/pages/Insights';
 import Notifications from '@/pages/Notifications';
 import CoupleConnect from '@/pages/couple/CoupleConnect';
 import AcceptInvite from '@/pages/couple/AcceptInvite';
@@ -198,6 +199,16 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <Insights />
+              </AppShell>
             </ProtectedRoute>
           }
         />

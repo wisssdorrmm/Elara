@@ -1,15 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Droplet, Activity, Smile, Zap, Moon, FileText } from 'lucide-react';
-
-const options = [
-  { label: 'Period', icon: Calendar, path: '/log/period' },
-  { label: 'Flow', icon: Droplet, path: '/log/flow' },
-  { label: 'Symptoms', icon: Activity, path: '/log/symptoms' },
-  { label: 'Mood', icon: Smile, path: '/log/mood' },
-  { label: 'Pain', icon: Zap, path: '/log/pain' },
-  { label: 'Sleep', icon: Moon, path: '/log/sleep' },
-  { label: 'Notes', icon: FileText, path: '/log/notes' },
-];
+import { LOG_ACTIONS } from '@/constants/logActions';
 
 export default function LogHub() {
   const navigate = useNavigate();
@@ -18,7 +8,7 @@ export default function LogHub() {
     <div className="space-y-5">
       <h1 className="text-xl font-bold text-text">What would you like to log?</h1>
       <div className="space-y-2.5">
-        {options.map(({ label, icon: Icon, path }) => (
+        {LOG_ACTIONS.map(({ label, icon: Icon, path }) => (
           <button
             key={label}
             onClick={() => navigate(path)}
