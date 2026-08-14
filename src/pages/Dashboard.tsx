@@ -100,15 +100,6 @@ export default function Dashboard() {
           nextPeriodDate={format(stats.nextPeriodDate, 'MMM d, yyyy')}
           cycleDay={stats.cycleDay}
           phase={stats.phase ?? 'follicular'}
-          isOverdue={stats.isOverdue}
-          daysOverdue={stats.daysOverdue}
-          forecastRange={
-            stats.forecast.earliestDate && stats.forecast.latestDate
-              ? `${format(stats.forecast.earliestDate, 'MMM d')} - ${format(stats.forecast.latestDate, 'MMM d')}`
-              : undefined
-          }
-          forecastConfidence={stats.forecast.confidence}
-          forecastExplanation={stats.forecast.explanation}
         />
       ) : (
         <Card>

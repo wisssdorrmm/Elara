@@ -1,6 +1,5 @@
 import { format } from 'date-fns';
 import { Sparkles, Activity, Smile, Droplets, Moon, Zap } from 'lucide-react';
-import type { ForecastConfidence } from '@/utils/cycle';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { SkeletonCard } from '@/components/ui/Skeleton';
@@ -11,20 +10,6 @@ import { usePeriods } from '@/hooks/usePeriods';
 import { useLogs } from '@/hooks/useLogs';
 import { computeCycleStats, phaseInfo } from '@/utils/cycle';
 import { computeInsightsSummary, generatePersonalInsights } from '@/utils/insights';
-
-const confidenceLabel: Record<ForecastConfidence, string> = {
-  high: 'High',
-  medium: 'Moderate',
-  low: 'Low',
-  insufficient: 'Basic estimate',
-};
-
-const confidenceTone: Record<ForecastConfidence, 'success' | 'warning' | 'danger' | 'neutral'> = {
-  high: 'success',
-  medium: 'warning',
-  low: 'danger',
-  insufficient: 'neutral',
-};
 
 export default function Insights() {
   const { profile, loading: profileLoading, error: profileError, refetch: refetchProfile } = useProfile();
@@ -114,39 +99,27 @@ export default function Insights() {
 
       {stats.nextPeriodDate && (
         <Card>
-          <div className="mb-3 flex items-center justify-between">
-            <p className="font-semibold text-text">Personalized Cycle Forecast</p>
-            <Badge tone={confidenceTone[stats.forecast.confidence]}>{confidenceLabel[stats.forecast.confidence]}</Badge>
-          </div>
+          <p className="mb-3 font-semibold text-text">Predictions</p>
           <div className="space-y-2.5 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-text-muted">Expected period</span>
-              <span className="font-medium text-text">
-                {stats.forecast.earliestDate && stats.forecast.latestDate
-                  ? `${format(stats.forecast.earliestDate, 'MMM d')} - ${format(stats.forecast.latestDate, 'MMM d')}`
-                  : format(stats.nextPeriodDate, 'MMM d, yyyy')}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-text-muted">Most likely</span>
+              <span className="text-text-muted">Next period</span>
               <span className="font-medium text-text">{format(stats.nextPeriodDate, 'MMM d, yyyy')}</span>
             </div>
             {stats.ovulationDate && (
               <div className="flex items-center justify-between">
-                <span className="text-text-muted">Estimated ovulation window</span>
+                <span className="text-text-muted">Estimated ovulation</span>
                 <span className="font-medium text-text">{format(stats.ovulationDate, 'MMM d')}</span>
               </div>
             )}
             {stats.fertileWindowStart && stats.fertileWindowEnd && (
               <div className="flex items-center justify-between">
-                <span className="text-text-muted">Estimated fertile window</span>
+                <span className="text-text-muted">Fertile window</span>
                 <span className="font-medium text-text">
                   {format(stats.fertileWindowStart, 'MMM d')} - {format(stats.fertileWindowEnd, 'MMM d')}
                 </span>
               </div>
             )}
           </div>
-          <p className="mt-3 text-xs text-text-muted">{stats.forecast.explanation}</p>
         </Card>
       )}
 
