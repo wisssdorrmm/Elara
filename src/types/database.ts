@@ -21,7 +21,7 @@ export type TimelineEventType =
   | 'memory'
   | 'challenge_completed'
   | 'other';
-export type XpSourceType = 'checkin' | 'appreciation' | 'date_logged' | 'challenge_completed' | 'streak_milestone';
+export type XpSourceType = 'checkin' | 'appreciation' | 'date_logged' | 'challenge_completed' | 'streak_milestone' | 'couple_question';
 export type PartnerAlertType = 'thinking_of_you' | 'sending_love' | 'im_here_for_you' | 'hope_good_day' | 'feeling_down' | 'call_me';
 
 export interface Database {
@@ -347,6 +347,43 @@ export interface Database {
           user_id: string;
         };
         Update: Partial<Database['public']['Tables']['privacy_settings']['Row']>;
+        Relationships: [];
+      };
+      /** Curated question bank for the Couple Q&A game. Seeded, not user-writable. */
+      couple_questions: {
+        Row: {
+          id: string;
+          question: string;
+          category: 'LOVE' | 'FUN' | 'KNOW_ME' | 'MEMORIES' | 'FUTURE' | 'DEEP' | 'DATE_NIGHT';
+          active: boolean;
+          created_at: string;
+        };
+        Insert: Partial<Omit<Database['public']['Tables']['couple_questions']['Row'], 'id' | 'created_at'>> & {
+          question: string;
+          category: string;
+        };
+        Update: Partial<Database['public']['Tables']['couple_questions']['Row']>;
+        Relationships: [];
+      };
+      /** One answer per user per question per relationship. Reveal is enforced by RLS. */
+      couple_question_answers: {
+        Row: {
+          id: string;
+          question_id: string;
+          relationship_id: string;
+          user_id: string;
+          answer: string;
+          answered_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Omit<Database['public']['Tables']['couple_question_answers']['Row'], 'id' | 'created_at' | 'updated_at'>> & {
+          question_id: string;
+          relationship_id: string;
+          user_id: string;
+          answer: string;
+        };
+        Update: Partial<Database['public']['Tables']['couple_question_answers']['Row']>;
         Relationships: [];
       };
     };

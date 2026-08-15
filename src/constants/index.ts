@@ -54,6 +54,18 @@ export const PARTNER_ALERT_OPTIONS: { value: PartnerAlertType; label: string }[]
   { value: 'call_me', label: '📞 Call me' },
 ];
 
+export type QuestionCategory = 'LOVE' | 'FUN' | 'KNOW_ME' | 'MEMORIES' | 'FUTURE' | 'DEEP' | 'DATE_NIGHT';
+
+export const QUESTION_CATEGORY_LABELS: Record<QuestionCategory, { label: string; emoji: string }> = {
+  LOVE: { label: 'Love', emoji: '❤️' },
+  FUN: { label: 'Fun', emoji: '😄' },
+  KNOW_ME: { label: 'Know Me', emoji: '💡' },
+  MEMORIES: { label: 'Memories', emoji: '📸' },
+  FUTURE: { label: 'Future', emoji: '🔮' },
+  DEEP: { label: 'Deep', emoji: '🌊' },
+  DATE_NIGHT: { label: 'Date Night', emoji: '🌙' },
+};
+
 export const BADGE_DEFINITIONS: Record<string, { label: string; emoji: string; description: string }> = {
   first_checkin: { label: 'First Check-in', emoji: '❤️', description: 'Completed your first daily check-in' },
   streak_7: { label: '7 Day Streak', emoji: '🔥', description: 'Checked in for 7 days in a row' },

@@ -12,6 +12,8 @@ type XpTotal = Database['public']['Tables']['couple_xp_totals']['Row'];
 type Badge = Database['public']['Tables']['couple_badges']['Row'];
 type WeeklyChallenge = Database['public']['Tables']['couple_weekly_challenges']['Row'];
 type PartnerAlert = Database['public']['Tables']['partner_alerts']['Row'];
+type CoupleQuestion = Database['public']['Tables']['couple_questions']['Row'];
+type CoupleQuestionAnswer = Database['public']['Tables']['couple_question_answers']['Row'];
 
 export const coupleEngagementService = {
   // ---- Streaks ----------------------------------------------------------
