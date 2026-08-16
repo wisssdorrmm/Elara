@@ -33,6 +33,7 @@ import Notifications from '@/pages/Notifications';
 import CoupleConnect from '@/pages/couple/CoupleConnect';
 import AcceptInvite from '@/pages/couple/AcceptInvite';
 import CoupleDashboard from '@/pages/couple/CoupleDashboard';
+import CoupleQuestion from '@/pages/couple/CoupleQuestion';
 import RelationshipDetails from '@/pages/couple/RelationshipDetails';
 import DailyCheckin from '@/pages/couple/DailyCheckin';
 import LogDate from '@/pages/couple/LogDate';
@@ -229,6 +230,14 @@ export default function App() {
               <AppShell>
                 <CoupleDashboard />
               </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/couple/question"
+          element={
+            <ProtectedRoute>
+              <CoupleQuestion />
             </ProtectedRoute>
           }
         />

@@ -28,6 +28,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useAuth } from '@/hooks/useAuth';
 import { useRelationship } from '@/hooks/useRelationship';
 import { useCoupleEngagement } from '@/hooks/useCoupleEngagement';
+import { useCoupleQuestion } from '@/hooks/useCoupleQuestion';
 import { coupleService } from '@/services/coupleService';
 import { coupleEngagementService } from '@/services/coupleEngagementService';
 import { formatRelationshipDuration, daysUntilNextAnnualDate } from '@/utils/relationship';
@@ -51,6 +52,7 @@ export default function CoupleDashboard() {
     error: engagementError,
     refetch: refetchEngagement,
   } = useCoupleEngagement(relationship?.id ?? null);
+  const { question: todayQuestion, myAnswer: myQuestionAnswer, revealed: questionRevealed } = useCoupleQuestion();
 
   const [disconnectOpen, setDisconnectOpen] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -242,6 +244,28 @@ export default function CoupleDashboard() {
           <p className="mt-1.5 text-xs text-text-muted">{level.nextLevelXp - level.xp} XP to next level</p>
         )}
       </Card>
+
+      {/* Today's Question */}
+      {todayQuestion && (
+        <Card interactive onClick={() => navigate('/couple/question')} role="button">
+          <div className="mb-2 flex items-center gap-2">
+            <Heart className="h-4 w-4 text-primary" />
+            <p className="font-semibold text-text">Today's Question</p>
+          </div>
+          <p className="mb-3 text-sm text-text">{todayQuestion.question}</p>
+          {myQuestionAnswer ? (
+            questionRevealed ? (
+              <Badge tone="success">You both answered 🎉</Badge>
+            ) : (
+              <Badge tone="warning">Waiting for your partner...</Badge>
+            )
+          ) : (
+            <Button variant="outline" fullWidth={false} className="px-4">
+              Answer Question
+            </Button>
+          )}
+        </Card>
+      )}
 
       {/* Last Date */}
       <Card>

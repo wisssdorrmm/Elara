@@ -182,4 +182,112 @@ export const coupleEngagementService = {
     const { error } = await supabase.rpc('notify_relationship_connected', { p_relationship_id: relationshipId });
     return { data: null, error: error?.message ?? null };
   },
+
+  // ---- Couple Question & Answer game --------------------------------------------
+  /**
+   * Fetches today's question deterministically. Both partners get the SAME
+   * question for the same day regardless of timezone: we pick the question
+   * by (days since a fixed epoch) % (active question count). This avoids
+   * random selection and timezone drift.
+   */
+  async getTodayQuestion(): Promise<ServiceResult<CoupleQuestion>> {
+    const { data, error } = await supabase
+      .from('couple_questions')
+      .select('*')
+      .eq('active', true)
+      .order('created_at', { ascending: true });
+    if (error) return { data: null, error: error.message };
+    if (!data || data.length === 0) return { data: null, error: 'No questions available yet.' };
+
+    const EPOCH = new Date('2026-01-01T00:00:00Z').getTime();
+    const today = new Date();
+    const dayNumber = Math.floor((today.getTime() - EPOCH) / (24 * 60 * 60 * 1000));
+    const index = ((dayNumber % data.length) + data.length) % data.length;
+    return { data: data[index], error: null };
+  },
+
+  /** Fetches the current user's answer for a given question in a relationship. */
+  async getMyAnswer(questionId: string, relationshipId: string, userId: string): Promise<ServiceResult<CoupleQuestionAnswer>> {
+    const { data, error } = await supabase
+      .from('couple_question_answers')
+      .select('*')
+      .eq('question_id', questionId)
+      .eq('relationship_id', relationshipId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) return { data: null, error: error.message };
+    return { data, error: null };
+  },
+
+  /**
+   * Fetches all answers for a question in a relationship. RLS enforces the
+   * reveal rule: the partner's answer is only returned once BOTH partners
+   * have answered. If only one has answered, only that user's own answer
+   * is returned.
+   */
+  async getAnswers(questionId: string, relationshipId: string): Promise<ServiceResult<CoupleQuestionAnswer[]>> {
+    const { data, error } = await supabase
+      .from('couple_question_answers')
+      .select('*')
+      .eq('question_id', questionId)
+      .eq('relationship_id', relationshipId);
+    if (error) return { data: null, error: error.message };
+    return { data: data ?? [], error: null };
+  },
+
+  /**
+   * Submits (or updates) the current user's answer. Upsert on the unique
+   * (question_id, relationship_id, user_id) so a user can never create
+   * duplicate answers — re-submitting edits their existing answer.
+   */
+  async submitAnswer(
+    questionId: string,
+    relationshipId: string,
+    userId: string,
+    answer: string
+  ): Promise<ServiceResult<CoupleQuestionAnswer>> {
+    const trimmed = answer.trim();
+    if (!trimmed) return { data: null, error: 'Answer cannot be empty.' };
+    if (trimmed.length > 1000) return { data: null, error: 'Answer must be 1000 characters or fewer.' };
+
+    const { data, error } = await supabase
+      .from('couple_question_answers')
+      .upsert(
+        { question_id: questionId, relationship_id: relationshipId, user_id: userId, answer: trimmed },
+        { onConflict: 'question_id,relationship_id,user_id' }
+      )
+      .select()
+      .single();
+    if (error) return { data: null, error: error.message };
+    return { data, error: null };
+  },
+
+  /**
+   * Saves a completed Q&A exchange as a memory in the existing
+   * relationship_timeline table (event_type = 'memory'). Reuses the existing
+   * memory/timeline system — no second memory system.
+   */
+  async saveQuestionToMemory(
+    relationshipId: string,
+    userId: string,
+    question: string,
+    myAnswer: string,
+    partnerAnswer: string
+  ): Promise<ServiceResult<TimelineEntry>> {
+    const description = `Q: ${question}\n\nYou: ${myAnswer}\n\nPartner: ${partnerAnswer}`;
+    const { data, error } = await supabase
+      .from('relationship_timeline')
+      .insert({
+        relationship_id: relationshipId,
+        created_by: userId,
+        event_type: 'memory',
+        title: 'Couple Question 💕',
+        description,
+        event_date: new Date().toISOString().slice(0, 10),
+      })
+      .select()
+      .single();
+    if (error) return { data: null, error: error.message };
+    return { data, error: null };
+  },
 };
