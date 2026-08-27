@@ -130,4 +130,4 @@ Remember to add your deployed domain to Supabase → Authentication → URL Conf
 
 ## Status
 
-This is the **Part 1 foundation build**: project scaffold, routing, design tokens, auth, Supabase schema/RLS, and functional (not yet pixel-perfect) versions of every screen. Screen-by-screen visual polish to match the uploaded designs exactly is planned for Part 2.
+Beyond the original foundation build, Ellara now includes full period/symptom/mood logging, cycle predictions and insights, end-of-period reports, and a couple engagement platform (invites, daily check-ins, appreciations, shared timeline, streaks, XP/levels, and a couple Q&A game). Push notifications for period reminders are not yet implemented (local/foreground notifications only).
